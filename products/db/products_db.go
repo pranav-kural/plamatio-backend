@@ -7,19 +7,41 @@ import (
 	"encore.dev/storage/sqldb"
 )
 
+type ProductsDB struct {
+	db *sqldb.Database
+}
+
+func GetProductsDB() (*ProductsDB, error) {
+	const PRODUCTS_DB_NAME = "products"
+	db := sqldb.Named(PRODUCTS_DB_NAME)
+	return &ProductsDB{db}, nil
+}
+
+
+func CreateProductsTable(ctx context.Context) (*sqldb.Database, error) {
+	var db = sqldb.NewDatabase("products", sqldb.DatabaseConfig{
+		Migrations: "./migrations",
+	})
+	return db, nil
+}
+
 // Inserts a product into the database.
-func Insert(ctx context.Context, db *sqldb.Database, name string, imageUrl string, price int) error {
-	_, err := db.Exec(ctx, `
-		INSERT INTO products (name, imageUrl, price)
-		VALUES ($1, $2, $3)
-	`, name, imageUrl, price)
-	return err
+// Inserts a product into the database and returns the id of the newly added record.
+func (pdb *ProductsDB) Insert(ctx context.Context, name string, imageUrl string, price int) (int, error) {
+    var id int
+    err := pdb.db.QueryRow(ctx, `
+        INSERT INTO products (name, imageUrl, price)
+        VALUES ($1, $2, $3)
+        RETURNING id
+    `, name, imageUrl, price).Scan(&id)
+
+    return id, err
 }
 
 // Retrieves a product from the database.
-func Get(ctx context.Context, db *sqldb.Database, id int) (*models.Product, error) {
+func (pdb *ProductsDB) Get(ctx context.Context, id int) (*models.Product, error) {
 	p := &models.Product{ID: id}
-	err := db.QueryRow(ctx, `
+	err := pdb.db.QueryRow(ctx, `
 		SELECT name, imageUrl, price FROM products
 		WHERE id = $1
 	`, id).Scan(&p.Name, &p.ImageURL, &p.Price)
@@ -27,8 +49,8 @@ func Get(ctx context.Context, db *sqldb.Database, id int) (*models.Product, erro
 }
 
 // Deletes a product from the database.
-func Delete(ctx context.Context, db *sqldb.Database, id int) error {
-	_, err := db.Exec(ctx, `
+func (pdb *ProductsDB) Delete(ctx context.Context, id int) error {
+	_, err := pdb.db.Exec(ctx, `
 		DELETE FROM products
 		WHERE id = $1
 	`, id)
@@ -36,8 +58,8 @@ func Delete(ctx context.Context, db *sqldb.Database, id int) error {
 }
 
 // Updates a product in the database.
-func Update(ctx context.Context, db *sqldb.Database, id int, name string, imageUrl string, price int) error {
-	_, err := db.Exec(ctx, `
+func (pdb *ProductsDB) Update(ctx context.Context, id int, name string, imageUrl string, price int) error {
+	_, err := pdb.db.Exec(ctx, `
 		UPDATE products
 		SET name = $1, imageUrl = $2, price = $3
 		WHERE id = $4
@@ -46,8 +68,8 @@ func Update(ctx context.Context, db *sqldb.Database, id int, name string, imageU
 }
 
 // Retrieves all products from the database.
-func GetAll(ctx context.Context, db *sqldb.Database) ([]*models.Product, error) {
-	rows, err := db.Query(ctx, `
+func (pdb *ProductsDB) GetAll(ctx context.Context) ([]*models.Product, error) {
+	rows, err := pdb.db.Query(ctx, `
 		SELECT id, name, imageUrl, price FROM products
 	`)
 	if err != nil {
