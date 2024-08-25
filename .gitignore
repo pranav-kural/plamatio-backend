@@ -2,3 +2,18 @@
 encore.gen.go
 encore.gen.cue
 /encore.gen
+
+# Private files
+private
+
+# Confluent / Kafka
+client.properties
+
+# VS Code
+.vscode
+
+# Environment variables
+.env
+
+# MacOS
+.DS_Store
