@@ -1,10 +1,12 @@
-# URL Shortener Starter
+# Crown Backend
 
-This is an Encore starter for a URL Shortener. It has two API endpoints and a PostgreSQL database to store the URL IDs and retrieve the full URL given an ID.
+Backend for the Crown Clothing E-commerce website.
 
-## Build from scratch with a tutorial
+Using PostgreSQL as the primary database.
 
-If you prefer to built it yourself, check out the [tutorial](https://encore.dev/docs/tutorials/rest-api) to learn how to build this application from scratch.
+Project built with [Encore](https://encore.dev/).
+
+More information coming soon.
 
 ## Developing locally
 
