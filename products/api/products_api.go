@@ -31,7 +31,7 @@ func Get(ctx context.Context, id int) (*models.Product, error) {
 
 // POST: /products
 // Inserts a product into the database.
-//encore:api public method=POST path=/products/add
+//encore:api private method=POST path=/products/add
 func Insert(ctx context.Context, p *models.ProductRequestParams) (*models.Product, error) {
 	// Insert the product into the database.
 	if id, err := PDB.Insert(ctx, p); err != nil {
@@ -44,7 +44,7 @@ func Insert(ctx context.Context, p *models.ProductRequestParams) (*models.Produc
 
 // DELETE: /products/delete/:id
 // Deletes the product from the database with the given ID.
-//encore:api public method=DELETE path=/products/delete/:id
+//encore:api private method=DELETE path=/products/delete/:id
 func Delete(ctx context.Context, id int) error {
 	// Delete the product from the database.
 	if err := PDB.Delete(ctx, id); err != nil {
@@ -56,7 +56,7 @@ func Delete(ctx context.Context, id int) error {
 
 // PUT: /products/update/:id
 // Updates the product in the database with the given ID.
-//encore:api public method=PUT path=/products/update/:id
+//encore:api private method=PUT path=/products/update/:id
 func Update(ctx context.Context, id int, p *models.ProductRequestParams) (*models.Product, error) {
 	// Update the product in the database.
 	if err := PDB.Update(ctx, id, p); err != nil {
