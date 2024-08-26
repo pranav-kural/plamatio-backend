@@ -1,36 +1,36 @@
-id,name,category,imageUrl,price
-2c716e1c-3c10-4277-9b86-800f0fa1dfa8,Brown Brim,Hats,https://i.ibb.co/ZYW3VTp/brown-brim.png,25
-33074cf9-9894-42e8-a384-286eb1f1c55e,Blue Beanie,Hats,https://i.ibb.co/ypkgK0X/blue-beanie.png,18
-47f90148-a66a-407a-a963-96e2ca145b54,Brown Cowboy,Hats,https://i.ibb.co/QdJwgmp/brown-cowboy.png,35
-1794ac4d-da93-443c-a7d2-35d3a482dce2,Grey Brim,Hats,https://i.ibb.co/RjBLWxB/grey-brim.png,25
-f93b78ca-5552-4286-ada9-281096cb3584,Green Beanie,Hats,https://i.ibb.co/YTjW3vF/green-beanie.png,18
-4e193651-21bf-4fa6-bfe1-341cdfd3c4ae,Palm Tree Cap,Hats,https://i.ibb.co/rKBDvJX/palm-tree-cap.png,14
-3d56c845-28f0-4ca1-aa9f-c3adcc33b454,Red Beanie,Hats,https://i.ibb.co/bLB646Z/red-beanie.png,18
-c2b4ee18-eefa-4532-a6f7-9c056978e540,Wolf Cap,Hats,https://i.ibb.co/1f2nWMM/wolf-cap.png,14
-18e64d54-879b-4d23-bf33-122e880b7f92,Blue Snapback,Hats,https://i.ibb.co/X2VJP2W/blue-snapback.png,16
-436b1589-9238-4dde-abac-df791b588369,Adidas NMD,Sneakers,https://i.ibb.co/0s3pdnc/adidas-nmd.png,220
-248a93e4-b1bc-4515-af2c-30603c33b849,Adidas Yeezy,Sneakers,https://i.ibb.co/dJbG1cT/yeezy.png,280
-ad88e9b2-56c3-4bec-b01b-606c8f70b55e,Black Converse,Sneakers,https://i.ibb.co/bPmVXyP/black-converse.png,110
-94525305-fa1a-4b0d-a46c-0fe82ffaa330,Nike White AirForce,Sneakers,https://i.ibb.co/1RcFPk0/white-nike-high-tops.png,160
-9845d047-7e51-40d7-a42a-79f4fdf095c4,Nike Red High Tops,Sneakers,https://i.ibb.co/QcvzydB/nikes-red.png,160
-7289000c-79bc-4f92-9e76-97c6ed72d4ab,Nike Brown High Tops,Sneakers,https://i.ibb.co/fMTV342/nike-brown.png,160
-b4ced7b5-2d7b-471a-95bf-04f78c5f6ad7,Air Jordan Limited,Sneakers,https://i.ibb.co/w4k6Ws9/nike-funky.png,190
-434574ef-51a2-4d80-a05c-72bcf49df837,Timberlands,Sneakers,https://i.ibb.co/Mhh6wBg/timberlands.png,200
-638046db-8f6d-4217-b1bb-1e1d2f17cfb1,Black Jean Shearling,Jackets,https://i.ibb.co/XzcwL5s/black-shearling.png,125
-8cca6428-ada0-4850-87b4-9022ad49b0cd,Blue Jean Jacket,Jackets,https://i.ibb.co/mJS6vz0/blue-jean-jacket.png,90
-61c9f026-18ae-44a2-953a-2b8077abe3a2,Grey Jean Jacket,Jackets,https://i.ibb.co/N71k1ML/grey-jean-jacket.png,90
-0ebf95a2-9d11-46b7-96ec-3c44b6c4fb48,Brown Shearling,Jackets,https://i.ibb.co/s96FpdP/brown-shearling.png,165
-1da97356-d1b6-4283-a7a6-34df7376329e,Tan Trench,Jackets,https://i.ibb.co/M6hHc3F/brown-trench.png,185
-71c6ea35-cbfb-45f5-a2be-a011d3ba025a,Blue Tanktop,Dresses,https://i.ibb.co/7CQVJNm/blue-tank.png,25
-09618c0d-6dc4-482f-9baa-147216998de8,Floral Blouse,Dresses,https://i.ibb.co/4W2DGKm/floral-blouse.png,20
-671422e6-a606-4150-bd29-258920da3776,Floral Dress,Dresses,https://i.ibb.co/KV18Ysr/floral-skirt.png,80
-7495c49c-4dad-4838-84e3-dc098666ab0e,Red Dots Dress,Dresses,https://i.ibb.co/N3BN1bh/red-polka-dot-dress.png,80
-200d4101-8ad4-4cec-ad31-ed34354d8ee0,Striped Sweater,Dresses,https://i.ibb.co/KmSkMbH/striped-sweater.png,45
-df86783f-3c70-4fa6-aed5-f451ea5178da,Yellow Track Suit,Dresses,https://i.ibb.co/v1cvwNf/yellow-track-suit.png,135
-5bd87cae-a081-48d6-83be-0652a62777bb,White Blouse,Dresses,https://i.ibb.co/qBcrsJg/white-vest.png,20
-1cd8909e-30c7-475b-9c09-57cff44ffaf8,Camo Down Vest,Tops,https://i.ibb.co/xJS0T3Y/camo-vest.png,325
-e9b23820-c94d-4b8a-8652-d15ead986a9b,Floral T-shirt,Tops,https://i.ibb.co/qMQ75QZ/floral-shirt.png,20
-5b63e140-3ed6-4e75-b795-48ad95f33caa,Black & White Longsleeve,Tops,https://i.ibb.co/55z32tw/long-sleeve.png,25
-c8a0d3a7-2f0a-40d1-9b85-eb5287db6e9b,Pink T-shirt,Tops,https://i.ibb.co/RvwnBL8/pink-shirt.png,25
-c8b3e385-e3da-4ec0-9a1f-acedf68da7d3,Jean Long Sleeve,Tops,https://i.ibb.co/VpW4x5t/roll-up-jean-shirt.png,40
-ff825d7f-5ece-4064-83f3-408f32afaf7d,Burgundy T-shirt,Tops,https://i.ibb.co/mh3VM1f/polka-dot-shirt.png,25
+name,category,imageUrl,price
+Brown Brim,Hats,https://i.ibb.co/ZYW3VTp/brown-brim.png,25
+Blue Beanie,Hats,https://i.ibb.co/ypkgK0X/blue-beanie.png,18
+Brown Cowboy,Hats,https://i.ibb.co/QdJwgmp/brown-cowboy.png,35
+Grey Brim,Hats,https://i.ibb.co/RjBLWxB/grey-brim.png,25
+Green Beanie,Hats,https://i.ibb.co/YTjW3vF/green-beanie.png,18
+Palm Tree Cap,Hats,https://i.ibb.co/rKBDvJX/palm-tree-cap.png,14
+Red Beanie,Hats,https://i.ibb.co/bLB646Z/red-beanie.png,18
+Wolf Cap,Hats,https://i.ibb.co/1f2nWMM/wolf-cap.png,14
+Blue Snapback,Hats,https://i.ibb.co/X2VJP2W/blue-snapback.png,16
+Adidas NMD,Sneakers,https://i.ibb.co/0s3pdnc/adidas-nmd.png,220
+Adidas Yeezy,Sneakers,https://i.ibb.co/dJbG1cT/yeezy.png,280
+Black Converse,Sneakers,https://i.ibb.co/bPmVXyP/black-converse.png,110
+Nike White AirForce,Sneakers,https://i.ibb.co/1RcFPk0/white-nike-high-tops.png,160
+Nike Red High Tops,Sneakers,https://i.ibb.co/QcvzydB/nikes-red.png,160
+Nike Brown High Tops,Sneakers,https://i.ibb.co/fMTV342/nike-brown.png,160
+Air Jordan Limited,Sneakers,https://i.ibb.co/w4k6Ws9/nike-funky.png,190
+Timberlands,Sneakers,https://i.ibb.co/Mhh6wBg/timberlands.png,200
+Black Jean Shearling,Jackets,https://i.ibb.co/XzcwL5s/black-shearling.png,125
+Blue Jean Jacket,Jackets,https://i.ibb.co/mJS6vz0/blue-jean-jacket.png,90
+Grey Jean Jacket,Jackets,https://i.ibb.co/N71k1ML/grey-jean-jacket.png,90
+Brown Shearling,Jackets,https://i.ibb.co/s96FpdP/brown-shearling.png,165
+Tan Trench,Jackets,https://i.ibb.co/M6hHc3F/brown-trench.png,185
+Blue Tanktop,Dresses,https://i.ibb.co/7CQVJNm/blue-tank.png,25
+Floral Blouse,Dresses,https://i.ibb.co/4W2DGKm/floral-blouse.png,20
+Floral Dress,Dresses,https://i.ibb.co/KV18Ysr/floral-skirt.png,80
+Red Dots Dress,Dresses,https://i.ibb.co/N3BN1bh/red-polka-dot-dress.png,80
+Striped Sweater,Dresses,https://i.ibb.co/KmSkMbH/striped-sweater.png,45
+Yellow Track Suit,Dresses,https://i.ibb.co/v1cvwNf/yellow-track-suit.png,135
+White Blouse,Dresses,https://i.ibb.co/qBcrsJg/white-vest.png,20
+Camo Down Vest,Tops,https://i.ibb.co/xJS0T3Y/camo-vest.png,325
+Floral T-shirt,Tops,https://i.ibb.co/qMQ75QZ/floral-shirt.png,20
+Black & White Longsleeve,Tops,https://i.ibb.co/55z32tw/long-sleeve.png,25
+Pink T-shirt,Tops,https://i.ibb.co/RvwnBL8/pink-shirt.png,25
+Jean Long Sleeve,Tops,https://i.ibb.co/VpW4x5t/roll-up-jean-shirt.png,40
+Burgundy T-shirt,Tops,https://i.ibb.co/mh3VM1f/polka-dot-shirt.png,25
