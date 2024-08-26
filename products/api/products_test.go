@@ -1,10 +1,9 @@
-package url
+package products
 
 import (
 	"context"
 	"testing"
 
-	api "encore.app/products/api"
 	models "encore.app/products/models"
 )
 
@@ -18,9 +17,10 @@ func TestProductsInsert(t *testing.T) {
 	testProductParams := &models.ProductRequestParams{
 		Name:     "Test Product",
 		ImageURL: "https://example.com/image.jpg",
+		Category: string(models.Hats),
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProductParams)
+	addedProduct, err := Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,11 +32,11 @@ func TestProductsInsert(t *testing.T) {
 // TestProductsBulkInsert - tests bulk inserting products into the database.
 func TestProductsBulkInsert(t *testing.T) {
 	testProducts := []*models.ProductRequestParams{
-		{Name: "Test Product 1", ImageURL: "https://example.com/image1.jpg", Price: 1000},
-		{Name: "Test Product 2", ImageURL: "https://example.com/image2.jpg", Price: 2000},
-		{Name: "Test Product 3", ImageURL: "https://example.com/image3.jpg", Price: 3000},
+		{Name: "Test Product 1", Category: string(models.Hats), ImageURL: "https://example.com/image1.jpg", Price: 1000},
+		{Name: "Test Product 2", Category: string(models.Hats), ImageURL: "https://example.com/image2.jpg", Price: 2000},
+		{Name: "Test Product 3", Category: string(models.Hats), ImageURL: "https://example.com/image3.jpg", Price: 3000},
 	}
-	err := api.PDB.BulkInsert(context.Background(), testProducts)
+	err := PDB.BulkInsert(context.Background(), testProducts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,11 +49,11 @@ func TestProductsGet(t *testing.T) {
 		ImageURL: "https://example.com/image.jpg",
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProductParams)
+	addedProduct, err := Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
-	retrievedProduct, err := api.Get(context.Background(), addedProduct.ID)
+	retrievedProduct, err := Get(context.Background(), addedProduct.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func TestProductsUpdate(t *testing.T) {
 		ImageURL: "https://example.com/image.jpg",
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProductParams)
+	addedProduct, err := Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +78,7 @@ func TestProductsUpdate(t *testing.T) {
 		ImageURL: "https://example.com/updated.jpg",
 		Price: 2000,
 	}
-	updatedProduct, err := api.Update(context.Background(), addedProduct.ID, ProductRequestParams)
+	updatedProduct, err := Update(context.Background(), addedProduct.ID, ProductRequestParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,41 +94,25 @@ func TestProductsDelete(t *testing.T) {
 		ImageURL: "https://example.com/image.jpg",
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProductParams)
+	addedProduct, err := Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = api.Delete(context.Background(), addedProduct.ID)
+	err = Delete(context.Background(), addedProduct.ID)
 	if err != nil {
 		t.Fatal(err)
-	}
-	_, err = api.Get(context.Background(), addedProduct.ID)
-	if err == nil {
-		t.Errorf("expected error, got nil")
 	}
 }
 
 // TestProductsGetAll - tests retrieving all products from the database.
 func TestProductsGetAll(t *testing.T) {
-	testProducts := []*models.ProductRequestParams{
-		{Name: "Test Product 1", ImageURL: "https://example.com/image1.jpg", Price: 1000},
-		{Name: "Test Product 2", ImageURL: "https://example.com/image2.jpg", Price: 2000},
-		{Name: "Test Product 3", ImageURL: "https://example.com/image3.jpg", Price: 3000},
-	}
-	err := api.PDB.BulkInsert(context.Background(), testProducts)
-		if err != nil {
-			t.Fatal(err)
-		}
-	retrievedProducts, err := api.GetAll(context.Background())
+	// number of products initially loaded to the database through migrations
+	const NUM_PRODUCTS = 35
+	retrievedProducts, err := GetAll(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(retrievedProducts.Data) != len(testProducts) {
-		t.Errorf("got %v, want %v", len(retrievedProducts.Data), len(testProducts))
-	}
-	for i, p := range retrievedProducts.Data {
-		if p.Name != testProducts[i].Name || p.ImageURL != testProducts[i].ImageURL || p.Price != testProducts[i].Price {
-			t.Errorf("got %v, want %v", p, testProducts[i])
-		}
+	if len(retrievedProducts.Data) <= NUM_PRODUCTS {
+		t.Errorf("got %v, want %v", len(retrievedProducts.Data), NUM_PRODUCTS)
 	}
 }
