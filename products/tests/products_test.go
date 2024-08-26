@@ -15,28 +15,41 @@ import (
 
 // TestProductsInsert - tests inserting a product into the database.
 func TestProductsInsert(t *testing.T) {
-	testProduct := &models.Product{
+	testProductParams := &models.ProductRequestParams{
 		Name:     "Test Product",
 		ImageURL: "https://example.com/image.jpg",
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProduct.Name, testProduct.ImageURL, testProduct.Price)
+	addedProduct, err := api.Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if addedProduct.Name != testProduct.Name || addedProduct.ImageURL != testProduct.ImageURL || addedProduct.Price != testProduct.Price {
-		t.Errorf("got %v, want %v", addedProduct, testProduct)
+	if addedProduct.Name != testProductParams.Name || addedProduct.ImageURL != testProductParams.ImageURL || addedProduct.Price != testProductParams.Price {
+		t.Errorf("got %v, want %v", addedProduct, testProductParams)
+	}
+}
+
+// TestProductsBulkInsert - tests bulk inserting products into the database.
+func TestProductsBulkInsert(t *testing.T) {
+	testProducts := []*models.ProductRequestParams{
+		{Name: "Test Product 1", ImageURL: "https://example.com/image1.jpg", Price: 1000},
+		{Name: "Test Product 2", ImageURL: "https://example.com/image2.jpg", Price: 2000},
+		{Name: "Test Product 3", ImageURL: "https://example.com/image3.jpg", Price: 3000},
+	}
+	err := api.PDB.BulkInsert(context.Background(), testProducts)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
 // TestProductsGet - tests retrieving a product from the database.
 func TestProductsGet(t *testing.T) {
-	testProduct := &models.Product{
+	testProductParams := &models.ProductRequestParams{
 		Name:     "Test Product",
 		ImageURL: "https://example.com/image.jpg",
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProduct.Name, testProduct.ImageURL, testProduct.Price)
+	addedProduct, err := api.Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,35 +64,37 @@ func TestProductsGet(t *testing.T) {
 
 // TestProductsUpdate - tests updating a product in the database.
 func TestProductsUpdate(t *testing.T) {
-	testProduct := &models.Product{
+	testProductParams := &models.ProductRequestParams{
 		Name:     "Test Product",
 		ImageURL: "https://example.com/image.jpg",
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProduct.Name, testProduct.ImageURL, testProduct.Price)
+	addedProduct, err := api.Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
-	newName := "Updated Product"
-	newImageURL := "https://example.com/updated.jpg"
-	newPrice := 2000
-	updatedProduct, err := api.Update(context.Background(), addedProduct.ID, newName, newImageURL, newPrice)
+	ProductRequestParams := &models.ProductRequestParams{
+		Name: "Updated Product",
+		ImageURL: "https://example.com/updated.jpg",
+		Price: 2000,
+	}
+	updatedProduct, err := api.Update(context.Background(), addedProduct.ID, ProductRequestParams)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if updatedProduct.Name != newName || updatedProduct.ImageURL != newImageURL || updatedProduct.Price != newPrice {
-		t.Errorf("got %v, want %v", updatedProduct, &models.Product{Name: newName, ImageURL: newImageURL, Price: newPrice})
+	if updatedProduct.Name != ProductRequestParams.Name || updatedProduct.ImageURL != ProductRequestParams.ImageURL || updatedProduct.Price != ProductRequestParams.Price {
+		t.Errorf("got %v, want %v", updatedProduct, ProductRequestParams)
 	}
 }
 
 // TestProductsDelete - tests deleting a product from the database.
 func TestProductsDelete(t *testing.T) {
-	testProduct := &models.Product{
+	testProductParams := &models.ProductRequestParams{
 		Name:     "Test Product",
 		ImageURL: "https://example.com/image.jpg",
 		Price:    1000,
 	}
-	addedProduct, err := api.Insert(context.Background(), testProduct.Name, testProduct.ImageURL, testProduct.Price)
+	addedProduct, err := api.Insert(context.Background(), testProductParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,27 +110,25 @@ func TestProductsDelete(t *testing.T) {
 
 // TestProductsGetAll - tests retrieving all products from the database.
 func TestProductsGetAll(t *testing.T) {
-	testProducts := []*models.Product{
+	testProducts := []*models.ProductRequestParams{
 		{Name: "Test Product 1", ImageURL: "https://example.com/image1.jpg", Price: 1000},
 		{Name: "Test Product 2", ImageURL: "https://example.com/image2.jpg", Price: 2000},
 		{Name: "Test Product 3", ImageURL: "https://example.com/image3.jpg", Price: 3000},
 	}
-	for _, p := range testProducts {
-		_, err := api.Insert(context.Background(), p.Name, p.ImageURL, p.Price)
+	err := api.PDB.BulkInsert(context.Background(), testProducts)
 		if err != nil {
 			t.Fatal(err)
 		}
-	}
 	retrievedProducts, err := api.GetAll(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(retrievedProducts) != len(testProducts) {
-		t.Errorf("got %d products, want %d", len(retrievedProducts), len(testProducts))
+	if len(retrievedProducts.Data) != len(testProducts) {
+		t.Errorf("got %v, want %v", len(retrievedProducts.Data), len(testProducts))
 	}
-	for i, p := range retrievedProducts {
-		if *p != *testProducts[i] {
-			t.Errorf("got %v, want %v", *p, *testProducts[i])
+	for i, p := range retrievedProducts.Data {
+		if p.Name != testProducts[i].Name || p.ImageURL != testProducts[i].ImageURL || p.Price != testProducts[i].Price {
+			t.Errorf("got %v, want %v", p, testProducts[i])
 		}
 	}
 }

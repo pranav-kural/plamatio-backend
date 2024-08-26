@@ -5,19 +5,23 @@ import (
 
 	db "encore.app/products/db"
 	models "encore.app/products/models"
+	"encore.dev/storage/sqldb"
 )
 
-// GET: /products/:id
+// Create a new database instance for the products database.
+var ProductsDB = sqldb.NewDatabase("products", sqldb.DatabaseConfig{
+		Migrations: "./migrations",
+	})
+
+// PDB is the ProductsDB instance.
+var PDB = &db.ProductsDB{DB: ProductsDB}
+
+// GET: /products/get/:id
 // Retrieves the product from the database with the given ID.
-//encore:api public method=GET path=/products/:id
+//encore:api public method=GET path=/products/get/:id
 func Get(ctx context.Context, id int) (*models.Product, error) {
-	// Get the products database instance.
-	pdb, err := db.GetProductsDB()
-	if err != nil {
-		return nil, err
-	}
 	// Retrieve the product from the database.
-	r, err := pdb.Get(ctx, id)
+	r, err := PDB.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -27,71 +31,50 @@ func Get(ctx context.Context, id int) (*models.Product, error) {
 
 // POST: /products
 // Inserts a product into the database.
-//encore:api public method=POST path=/products
-func Insert(ctx context.Context, name string, imageUrl string, price int) (*models.Product, error) {
-	// Get the products database instance.
-	pdb, err := db.GetProductsDB()
-	if err != nil {
-		return nil, err
-	}
+//encore:api public method=POST path=/products/add
+func Insert(ctx context.Context, p *models.ProductRequestParams) (*models.Product, error) {
 	// Insert the product into the database.
-	if id, err := pdb.Insert(ctx, name, imageUrl, price); err != nil {
+	if id, err := PDB.Insert(ctx, p); err != nil {
 		return nil, err
 	} else {
 		// Return the product.
-		return &models.Product{ID: id, Name: name, ImageURL: imageUrl, Price: price}, nil
+		return &models.Product{ID: id, Name: p.Name, ImageURL: p.ImageURL, Price: p.Price}, nil
 	}
 }
 
-// DELETE: /products/:id
+// DELETE: /products/delete/:id
 // Deletes the product from the database with the given ID.
-//encore:api public method=DELETE path=/products/:id
+//encore:api public method=DELETE path=/products/delete/:id
 func Delete(ctx context.Context, id int) error {
-	// Get the products database instance.
-	pdb, err := db.GetProductsDB()
-	if err != nil {
-		return err
-	}
 	// Delete the product from the database.
-	if err := pdb.Delete(ctx, id); err != nil {
+	if err := PDB.Delete(ctx, id); err != nil {
 		return err
 	}
 	// Return nil if successful.
 	return nil
 }
 
-// PUT: /products/:id
+// PUT: /products/update/:id
 // Updates the product in the database with the given ID.
-//encore:api public method=PUT path=/products/:id
-func Update(ctx context.Context, id int, name string, imageUrl string, price int) (*models.Product, error) {
-	// Get the products database instance.
-	pdb, err := db.GetProductsDB()
-	if err != nil {
-		return nil, err
-	}
+//encore:api public method=PUT path=/products/update/:id
+func Update(ctx context.Context, id int, p *models.ProductRequestParams) (*models.Product, error) {
 	// Update the product in the database.
-	if err := pdb.Update(ctx, id, name, imageUrl, price); err != nil {
+	if err := PDB.Update(ctx, id, p); err != nil {
 		return nil, err
 	}
 	// Return the updated product.
-	return &models.Product{ID: id, Name: name, ImageURL: imageUrl, Price: price}, nil
+	return &models.Product{ID: id, Name: p.Name, ImageURL: p.ImageURL, Price: p.Price}, nil
 }
 
 // GET: /products/all
 // Retrieves all products from the database.
 //encore:api public method=GET path=/products/all
-func GetAll(ctx context.Context) ([]*models.Product, error) {
-	// Get the products database instance.
-	pdb, err := db.GetProductsDB()
-	if err != nil {
-		return nil, err
-	}
+func GetAll(ctx context.Context) (*models.Products, error) {
 	// Retrieve all products from the database.
-	r, err := pdb.GetAll(ctx)
+	r, err := PDB.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 	// Return the products.
 	return r, err
 }
-
