@@ -38,7 +38,7 @@ func Insert(ctx context.Context, p *models.ProductRequestParams) (*models.Produc
 		return nil, err
 	} else {
 		// Return the product.
-		return &models.Product{ID: id, Name: p.Name, ImageURL: p.ImageURL, Price: p.Price}, nil
+		return &models.Product{ID: id, Name: p.Name, Description: p.Description, CategoryId: models.ProductCategory(p.CategoryId), ImageURL: p.ImageURL, Price: p.Price}, nil
 	}
 }
 
@@ -63,7 +63,7 @@ func Update(ctx context.Context, id int, p *models.ProductRequestParams) (*model
 		return nil, err
 	}
 	// Return the updated product.
-	return &models.Product{ID: id, Name: p.Name, ImageURL: p.ImageURL, Price: p.Price}, nil
+	return &models.Product{ID: id, Name: p.Name, Description: p.Description, CategoryId: models.ProductCategory(p.CategoryId), ImageURL: p.ImageURL, Price: p.Price}, nil
 }
 
 // GET: /products/all
@@ -72,6 +72,45 @@ func Update(ctx context.Context, id int, p *models.ProductRequestParams) (*model
 func GetAll(ctx context.Context) (*models.Products, error) {
 	// Retrieve all products from the database.
 	r, err := PDB.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// Return the products.
+	return r, err
+}
+
+// GET: /products/category/:id
+// Retrieves all products from the database by category.
+//encore:api public method=GET path=/products/category/:id
+func GetByCategory(ctx context.Context, id int) (*models.Products, error) {
+	// Retrieve all products from the database by category.
+	r, err := PDB.GetByCategory(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// Return the products.
+	return r, err
+}
+
+// GET: /products/hero-products
+// Retrieves all hero products from the database.
+//encore:api public method=GET path=/products/hero-products
+func GetHeroProducts(ctx context.Context) (*models.Products, error) {
+	// Retrieve all hero products from the database.
+	r, err := PDB.GetHeroProducts(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// Return the products.
+	return r, err
+}
+
+// GET: /products/search/:query
+// Retrieves all products from the database by search query.
+//encore:api public method=GET path=/products/search/:query
+func Search(ctx context.Context, query string) (*models.Products, error) {
+	// Retrieve all products from the database by search query.
+	r, err := PDB.Search(ctx, query)
 	if err != nil {
 		return nil, err
 	}
