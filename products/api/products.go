@@ -7,6 +7,8 @@ import (
 	categoriesModels "encore.app/categories/models"
 	db "encore.app/products/db"
 	models "encore.app/products/models"
+	"encore.dev/beta/auth"
+	"encore.dev/beta/errs"
 	"encore.dev/storage/cache"
 	"encore.dev/storage/sqldb"
 )
@@ -64,18 +66,32 @@ var HeroProductsCacheKeyspace = cache.NewStructKeyspace[string, models.Products]
 // ------------------------------------------------------
 // Setup Authentication
 
-// TODO: Set up authentication.
 // secrets struct for API-key authentication.
-// var secrets struct {
-//     PlamatioWebFrontendApiKey string    // API key for the Plamatio Web Frontend
-// }
+var secrets struct {
+    PlamatioWebFrontendApiKey string    // API key for the Plamatio Web Frontend
+}
+
+// AuthHandler - authentication handler to validate API key for authenticated endpoints.
+//encore:authhandler
+func AuthHandler(ctx context.Context, token string) (auth.UID, error) {
+    // Validate the token - confirm it matches the API key.
+		if token == secrets.PlamatioWebFrontendApiKey {
+			// Return nil if the token is valid.
+			return auth.UID("authenticated"), nil
+		}
+		// Return an error if API key is invalid.
+		return "", &errs.Error{
+        Code: errs.Unauthenticated,
+        Message: "invalid API key",	
+    }
+}
 
 // ------------------------------------------------------
 // Setup API
 
 // GET: /products/get/:id
 // Retrieves the product from the database with the given ID.
-//encore:api public method=GET path=/products/get/:id
+//encore:api auth method=GET path=/products/get/:id
 func Get(ctx context.Context, id int) (*models.Product, error) {
 	// First, try retrieving the product from cache if it exists.
 	c, err := ProductCacheKeyspace.Get(ctx, id)
@@ -136,7 +152,7 @@ func Update(ctx context.Context, id int, p *models.ProductRequestParams) (*model
 
 // GET: /products/all
 // Retrieves all products from the database.
-//encore:api public method=GET path=/products/all
+//encore:api auth method=GET path=/products/all
 func GetAll(ctx context.Context) (*models.Products, error) {
 	// First, try retrieving all products from cache if they exist.
 	c, err := ProductsCacheKeyspace.Get(ctx, "all")
@@ -159,7 +175,7 @@ func GetAll(ctx context.Context) (*models.Products, error) {
 
 // GET: /products/category/:id
 // Retrieves all products from the database by category.
-//encore:api public method=GET path=/products/category/:id
+//encore:api auth method=GET path=/products/category/:id
 func GetByCategory(ctx context.Context, id int) (*models.Products, error) {
 	// First, try retrieving all products from cache if they exist.
 	c, err := ProductCategoryCacheKeyspace.Get(ctx, id)
@@ -182,7 +198,7 @@ func GetByCategory(ctx context.Context, id int) (*models.Products, error) {
 
 // GET: /products/hero-products
 // Retrieves all hero products from the database.
-//encore:api public method=GET path=/products/hero
+//encore:api auth method=GET path=/products/hero
 func GetHeroProducts(ctx context.Context) (*models.Products, error) {
 	// First, try retrieving all hero products from cache if they exist.
 	c, err := HeroProductsCacheKeyspace.Get(ctx, "all")
@@ -205,7 +221,7 @@ func GetHeroProducts(ctx context.Context) (*models.Products, error) {
 
 // GET: /products/search/:query
 // Retrieves all products from the database by search query.
-//encore:api public method=GET path=/products/search/:query
+//encore:api auth method=GET path=/products/search/:query
 func Search(ctx context.Context, query string) (*models.Products, error) {
 	// First, try retrieving all products from cache if they exist.
 	c, err := ProductSearchCacheKeyspace.Get(ctx, query)
