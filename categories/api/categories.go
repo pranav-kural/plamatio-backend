@@ -1,17 +1,21 @@
-package products
+package categories
 
 import (
 	"context"
 
-	db "encore.app/products/db"
-	models "encore.app/products/models"
+	db "encore.app/categories/db"
+	models "encore.app/categories/models"
+	"encore.dev/storage/sqldb"
 )
 
-// PDB is the ProductsDB instance.
+// ProductDB instance
+var ProductsDB = sqldb.Named("products")
+
+// CategoriesTable instance
 var CategoriesTable = &db.CategoriesTable{DB: ProductsDB}
 
-// GET: /products/get/:id
-// Retrieves the product from the database with the given ID.
+// GET: /categories/get/:id
+// Retrieves the category from the database with the given ID.
 //encore:api public method=GET path=/categories/get/:id
 func GetCategory(ctx context.Context, id int) (*models.Category, error) {
 	// Retrieve the product from the database.
@@ -23,8 +27,8 @@ func GetCategory(ctx context.Context, id int) (*models.Category, error) {
 	return r, err
 }
 
-// GET: /products/all
-// Retrieves all products from the database.
+// GET: /categories/all
+// Retrieves all categories from the database.
 //encore:api public method=GET path=/categories/all
 func GetCategories(ctx context.Context) (*models.Categories, error) {
 	// Retrieve all products from the database.

@@ -1,10 +1,14 @@
 package products
 
+import (
+	categoriesModels "encore.app/categories/models"
+)
+
 type Product struct {
 	ID       int    `json:"id"` // unique identifier
 	Name     string `json:"name"` // name of the product
 	Description string `json:"description"` // description of the product
-	CategoryId ProductCategory `json:"category"`// category of the product
+	CategoryId  categoriesModels.ProductCategory `json:"category"`// category of the product
 	ImageURL string `json:"imageUrl"` // URL to the product image
 	Price    int    `json:"price"` // price of the product in cents
 }

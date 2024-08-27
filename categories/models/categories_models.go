@@ -8,7 +8,7 @@ CREATE TABLE categories (
 );
 */
 
-package products
+package categories
 
 type ProductCategory int
 

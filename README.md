@@ -1,6 +1,6 @@
-# Crown Backend
+# Plamatio Backend
 
-Backend for the Crown Clothing E-commerce website.
+Backend for the Plamatio E-commerce website.
 
 Using PostgreSQL as the primary database.
 

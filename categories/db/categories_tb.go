@@ -1,10 +1,10 @@
-package products
+package categories
 
 import (
 	"context"
 
-	models "encore.app/products/models"
-	utils "encore.app/products/utils"
+	models "encore.app/categories/models"
+	utils "encore.app/categories/utils"
 	"encore.dev/storage/sqldb"
 )
 

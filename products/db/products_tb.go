@@ -8,7 +8,7 @@ import (
 	"encore.dev/storage/sqldb"
 )
 
-type ProductsDB struct {
+type ProductsTB struct {
 	DB *sqldb.Database
 }
 
@@ -51,7 +51,7 @@ const (
 
 // Inserts a product into the database.
 // Inserts a product into the database and returns the id of the newly added record.
-func (pdb *ProductsDB) Insert(ctx context.Context, p *models.ProductRequestParams) (int, error) {
+func (pdb *ProductsTB) Insert(ctx context.Context, p *models.ProductRequestParams) (int, error) {
     var id int
     err := pdb.DB.QueryRow(ctx, SQL_INSERT_PRODUCT, p.Name, p.Description, p.CategoryId, p.ImageURL, p.Price).Scan(&id)
 		
@@ -59,7 +59,7 @@ func (pdb *ProductsDB) Insert(ctx context.Context, p *models.ProductRequestParam
 }
 
 // Bulk inserts products into the database.
-func (pdb *ProductsDB) BulkInsert(ctx context.Context, products []*models.ProductRequestParams) error {
+func (pdb *ProductsTB) BulkInsert(ctx context.Context, products []*models.ProductRequestParams) error {
 	tx, err := pdb.DB.Begin(ctx)
 	if err != nil {
 		return err
@@ -86,26 +86,26 @@ func (pdb *ProductsDB) BulkInsert(ctx context.Context, products []*models.Produc
 }
 
 // Deletes a product from the database.
-func (pdb *ProductsDB) Delete(ctx context.Context, id int) error {
+func (pdb *ProductsTB) Delete(ctx context.Context, id int) error {
 	_, err := pdb.DB.Exec(ctx, SQL_DELETE_PRODUCT, id)
 	return err
 }
 
 // Updates a product in the database.
-func (pdb *ProductsDB) Update(ctx context.Context, id int, p *models.ProductRequestParams) error {
+func (pdb *ProductsTB) Update(ctx context.Context, id int, p *models.ProductRequestParams) error {
 	_, err := pdb.DB.Exec(ctx, SQL_UPDATE_PRODUCT, p.Name, p.Description, p.CategoryId, p.ImageURL, p.Price, id)
 	return err
 }
 
 // Retrieves a product from the database.
-func (pdb *ProductsDB) Get(ctx context.Context, id int) (*models.Product, error) {
+func (pdb *ProductsTB) Get(ctx context.Context, id int) (*models.Product, error) {
 	p := &models.Product{ID: id}
 	err := pdb.DB.QueryRow(ctx, SQL_GET_PRODUCT, id).Scan(&p.Name, &p.Description, &p.CategoryId, &p.ImageURL, &p.Price)
 	return p, err
 }
 
 // Retrieves all products from the database.
-func (pdb *ProductsDB) GetAll(ctx context.Context) (*models.Products, error) {
+func (pdb *ProductsTB) GetAll(ctx context.Context) (*models.Products, error) {
 	rows, err := pdb.DB.Query(ctx, SQL_GET_ALL_PRODUCTS)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (pdb *ProductsDB) GetAll(ctx context.Context) (*models.Products, error) {
 }
 
 // Retrieves all products from the database by category.
-func (pdb *ProductsDB) GetByCategory(ctx context.Context, id int) (*models.Products, error) {
+func (pdb *ProductsTB) GetByCategory(ctx context.Context, id int) (*models.Products, error) {
 	rows, err := pdb.DB.Query(ctx, SQL_GET_PRODUCTS_BY_CATEGORY, id)
 	if err != nil {
 		return nil, err
@@ -142,18 +142,8 @@ func (pdb *ProductsDB) GetByCategory(ctx context.Context, id int) (*models.Produ
 	return &models.Products{Data: products}, nil
 }
 
-/*
-CREATE TABLE hero_products (
-    category_id BIGINT NOT NULL,
-    product_id BIGINT NOT NULL,
-    PRIMARY KEY (category_id, product_id),
-    FOREIGN KEY (category_id) REFERENCES categories(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
-);
-*/
-
 // Retrieve hero products from the database.
-func (pdb *ProductsDB) GetHeroProducts(ctx context.Context) (*models.Products, error) {
+func (pdb *ProductsTB) GetHeroProducts(ctx context.Context) (*models.Products, error) {
 	// Query the database for hero products.
 	rows, err := pdb.DB.Query(ctx, SQL_GET_HERO_PRODUCTS)
 	if err != nil {
@@ -174,7 +164,7 @@ func (pdb *ProductsDB) GetHeroProducts(ctx context.Context) (*models.Products, e
 }
 
 // Retrieve products based on search query.
-func (pdb *ProductsDB) Search(ctx context.Context, query string) (*models.Products, error) {
+func (pdb *ProductsTB) Search(ctx context.Context, query string) (*models.Products, error) {
 	// Query the database for products based on search query.
 	rows, err := pdb.DB.Query(ctx, "SELECT id, name, description, category_id, image_url FROM products WHERE name ILIKE $1", "%"+query+"%")
 
