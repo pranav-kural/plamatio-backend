@@ -10,13 +10,17 @@ import (
 	"encore.dev/storage/sqldb"
 )
 
+// ------------------------------------------------------
+// Setup Database
+
 // ProductDB instance.
 var ProductsDB = sqldb.Named("products")
 
 // CategoriesTable instance.
 var CategoriesTable = &db.CategoriesTable{DB: ProductsDB}
 
-// Define caches stores.
+// ------------------------------------------------------
+// Setup Caching
 
 // CategoriesCluster is the cache cluster for categories.
 var CategoriesCluster = cache.NewCluster("categories-cache-cluster", cache.ClusterConfig{
@@ -24,17 +28,20 @@ var CategoriesCluster = cache.NewCluster("categories-cache-cluster", cache.Clust
     EvictionPolicy: cache.AllKeysLRU,
 })
 
-// Categories Cache Keyspace to store categories by ID.
+// Category Cache Keyspace to store category data by ID.
 var CategoryCacheKeyspace = cache.NewStructKeyspace[int, models.Category](CategoriesCluster, cache.KeyspaceConfig{
 	KeyPattern:    "category-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
 
-// CategoriesAll Cache Keyspace to store all categories.
+// Categories Cache Keyspace to store all categories at key "all".
 var CategoriesCacheKeyspace = cache.NewStructKeyspace[string, models.Categories](CategoriesCluster, cache.KeyspaceConfig{
 	KeyPattern:    "categories-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
+
+// ------------------------------------------------------
+// Setup API
 
 // GET: /categories/get/:id
 // Retrieves the category from the database with the given ID.
