@@ -17,6 +17,11 @@ var ProductsDB = sqldb.NewDatabase("products", sqldb.DatabaseConfig{
 // ProductsTB is the products table instance.
 var ProductsTB = &db.ProductsTB{DB: ProductsDB}
 
+// secrets struct for API-key authentication.
+var secrets struct {
+    PlamatioWebFrontendApiKey string    // API key for the Plamatio Web Frontend
+}
+
 // GET: /products/get/:id
 // Retrieves the product from the database with the given ID.
 //encore:api public method=GET path=/products/get/:id

@@ -1,13 +1,3 @@
-/*
-CREATE TABLE categories (
-    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name TEXT NOT NULL,
-    description TEXT,
-    image_url TEXT NOT NULL,
-    offered BOOLEAN NOT NULL
-);
-*/
-
 package categories
 
 type ProductCategory int
