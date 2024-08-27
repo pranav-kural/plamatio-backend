@@ -95,7 +95,7 @@ func GetByCategory(ctx context.Context, id int) (*models.Products, error) {
 
 // GET: /products/hero-products
 // Retrieves all hero products from the database.
-//encore:api public method=GET path=/products/hero-products
+//encore:api public method=GET path=/products/hero
 func GetHeroProducts(ctx context.Context) (*models.Products, error) {
 	// Retrieve all hero products from the database.
 	r, err := ProductsTB.GetHeroProducts(ctx)
