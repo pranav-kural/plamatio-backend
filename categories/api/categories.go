@@ -45,7 +45,7 @@ var CategoriesCacheKeyspace = cache.NewStructKeyspace[string, models.Categories]
 
 // GET: /categories/get/:id
 // Retrieves the category from the database with the given ID.
-//encore:api public method=GET path=/categories/get/:id
+//encore:api auth method=GET path=/categories/get/:id
 func GetCategory(ctx context.Context, id int) (*models.Category, error) {
 	// First, try retrieving the category from cache if it exists.
 	c, err := CategoryCacheKeyspace.Get(ctx, id)
@@ -68,7 +68,7 @@ func GetCategory(ctx context.Context, id int) (*models.Category, error) {
 
 // GET: /categories/all
 // Retrieves all categories from the database.
-//encore:api public method=GET path=/categories/all
+//encore:api auth method=GET path=/categories/all
 func GetCategories(ctx context.Context) (*models.Categories, error) {
 	// First, try retrieving all categories from cache if they exist.
 	c, err := CategoriesCacheKeyspace.Get(ctx, "all")
