@@ -24,3 +24,22 @@ type CartItem struct {
 type CartItems struct {
 	Data []*CartItem `json:"data"`
 }
+
+type NewCartItem struct {
+	ProductID int `json:"product_id"`
+	Quantity  int `json:"quantity"`
+	UserID    int `json:"user_id"`
+}
+
+type NewCartItems struct {
+	Data []*NewCartItem `json:"data"`
+}
+
+type CartChangeRequestStatus struct {
+	Status string `json:"status"`
+}
+
+const (
+	CartRequestSuccess = "success" // CartRequestSuccess is the status for a successful cart request.
+	CartRequestFailed  = "failed"  // CartRequestFailed is the status for a failed cart request.
+)

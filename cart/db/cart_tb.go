@@ -2,8 +2,10 @@ package cart
 
 import (
 	"context"
+	"errors"
 
 	models "encore.app/cart/models"
+	utils "encore.app/cart/utils"
 	"encore.dev/storage/sqldb"
 )
 
@@ -97,20 +99,37 @@ func (tb *CartItemsTable) GetCartItemsByUser(ctx context.Context, userId int) (*
 }
 
 // Inserts a cart item into the database.
-func (tb *CartItemsTable) InsertCartItem(ctx context.Context, productID int, quantity int, userID int) (int, error) {
-	var id int
-	err := tb.DB.QueryRow(ctx, SQL_INSERT_CART_ITEM, productID, quantity, userID).Scan(&id)
-	return id, err
+func (tb *CartItemsTable) InsertCartItem(ctx context.Context, productID int, quantity int, userID int) (*models.CartItem, error) {
+	// validate cart item data
+	err := utils.ValidateCartData(&models.CartItem{ProductID: productID, Quantity: quantity, UserID: userID}, false, false)
+	if err != nil {
+		return nil, err
+	}
+	ci := &models.CartItem{ProductID: productID, Quantity: quantity, UserID: userID}
+	err = tb.DB.QueryRow(ctx, SQL_INSERT_CART_ITEM, productID, quantity, userID).Scan(&ci.ID)
+	if err != nil {
+		return nil, err
+	}
+	return ci, nil
 }
 
 // Updates a cart item in the database.
 func (tb *CartItemsTable) UpdateCartItem(ctx context.Context, productID int, quantity int, userID int, id int) error {
-	_, err := tb.DB.Exec(ctx, SQL_UPDATE_CART_ITEM, productID, quantity, userID, id)
+	// validate cart item data
+	err := utils.ValidateCartData(&models.CartItem{ID: id, ProductID: productID, Quantity: quantity, UserID: userID}, true, false)
+	if err != nil {
+		return err
+	}
+	_, err = tb.DB.Exec(ctx, SQL_UPDATE_CART_ITEM, productID, quantity, userID, id)
 	return err
 }
 
 // Deletes a cart item from the database.
 func (tb *CartItemsTable) DeleteCartItem(ctx context.Context, id int) error {
+	// Validate ID
+	if id <= 0 {
+		return errors.New("invalid cart item ID")
+	}
 	_, err := tb.DB.Exec(ctx, SQL_DELETE_CART_ITEM, id)
 	return err
 }

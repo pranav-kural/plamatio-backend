@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	db "encore.app/products/db"
@@ -270,7 +271,7 @@ func GetHeroProducts(ctx context.Context) (*models.Products, error) {
 // Retrieves all hero products from the database by category.
 //encore:api auth method=GET path=/products/hero/category/:category
 func GetHeroProductsByCategory(ctx context.Context, category int) (*models.Products, error) {
-	c, err := HeroProductsCacheKeyspace.Get(ctx, string(rune(category)))
+	c, err := HeroProductsCacheKeyspace.Get(ctx, strconv.Itoa(category))
 	// if hero products are found (i.e., no error), return them
 	if err == nil {
 		return &c, nil
@@ -281,7 +282,7 @@ func GetHeroProductsByCategory(ctx context.Context, category int) (*models.Produ
 		return nil, err
 	}
 	// Cache the hero products by category.
-	if err := HeroProductsCacheKeyspace.Set(ctx, string(rune(category)), *r); err != nil {
+	if err := HeroProductsCacheKeyspace.Set(ctx, strconv.Itoa(category), *r); err != nil {
 		return nil, err
 	}
 	// Return the products.
