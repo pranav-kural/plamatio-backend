@@ -1,0 +1,10 @@
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (1, 'T-shirts', 'T-shirts like never before. Llama inspired, human approved.', 1, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (2, 'Hoodies', 'Hoodies for days good and bad. Cool design to keep you warm.', 1, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (3, 'Sweatshirts', 'Sweatshirts that make you sweat. In a good way.', 1, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (4, 'Shorts', 'Shorts for all occasions. Llama inspired.', 1, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (5, 'Candles', 'Candles to suit every mood. Handmade with love.', 2, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (6, 'Desk Mats', 'Desk mats that make your desk look good. And feel good', 2, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (7, 'Notebooks', 'Notebooks that inspire creativity. And productivity.', 2, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (8, 'Bottles', 'Bottles that fit your style. And your bag. And your life.', 3, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (9, 'Mugs', 'Mugs to empower your mornings. And your evenings. And your nights.', 3, true);
+INSERT INTO sub_categories (id, name, description, category_id, offered) VALUES (10, 'Tumblers', 'Tumblers that keep your drinks hot. Or cold. Or just right.', 3, true);

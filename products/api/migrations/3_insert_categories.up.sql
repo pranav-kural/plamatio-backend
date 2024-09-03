@@ -1,0 +1,3 @@
+INSERT INTO categories (id, name, description, offered) VALUES (1, 'Clothing', 'Llama inspired clothing that embraces all cultures and promotes well-being and self-love.', true);
+INSERT INTO categories (id, name, description, offered) VALUES (2, 'Accessories', 'Llama inspired Accessories. Find the perfect gift for your loved ones. Or yourself.', true);
+INSERT INTO categories (id, name, description, offered) VALUES (3, 'Drinkware', 'Llama inspired drinkware. Not just usable but also beautiful. Drink, Live, Laugh, Love.', true);
