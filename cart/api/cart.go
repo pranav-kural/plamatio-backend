@@ -3,7 +3,6 @@ package cart
 import (
 	"context"
 	"errors"
-	"strconv"
 	"time"
 
 	db "encore.app/cart/db"
@@ -37,7 +36,7 @@ var CartItemCacheKeyspace = cache.NewStructKeyspace[int, models.CartItem](CartCl
 })
 
 // Cart Items Cache Keyspace to store all cart items for a user.
-var CartItemsCacheKeyspace = cache.NewStructKeyspace[string, models.CartItems](CartCluster, cache.KeyspaceConfig{
+var CartItemsCacheKeyspace = cache.NewStructKeyspace[int, models.CartItems](CartCluster, cache.KeyspaceConfig{
 	KeyPattern:    "user-cart-items-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
@@ -77,7 +76,7 @@ func GetCartItems(ctx context.Context, user_id int) (*models.CartItems, error) {
 		return nil, errors.New("invalid user_id")
 	}
 	// First, try retrieving all cart items for a user from cache if they exist.
-	c, err := CartItemsCacheKeyspace.Get(ctx, strconv.Itoa(user_id))
+	c, err := CartItemsCacheKeyspace.Get(ctx, user_id)
 	// if cart items are found (i.e., no error), return them
 	if err == nil {
 		return &c, nil
@@ -88,7 +87,7 @@ func GetCartItems(ctx context.Context, user_id int) (*models.CartItems, error) {
 		return nil, err
 	}
 	// Cache the cart items.
-	if err := CartItemsCacheKeyspace.Set(ctx, strconv.Itoa(user_id), *r); err != nil {
+	if err := CartItemsCacheKeyspace.Set(ctx, user_id, *r); err != nil {
 		return nil, err
 	}
 	// Return the cart items.
@@ -105,7 +104,7 @@ func AddCartItem(ctx context.Context, newCartItem *models.NewCartItem) (*models.
 		return nil, err
 	}
 	// Invalidate the cache for the user's cart items.
-	_, err = CartItemsCacheKeyspace.Delete(ctx, strconv.Itoa(newCartItem.UserID))
+	_, err = CartItemsCacheKeyspace.Delete(ctx, newCartItem.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +124,7 @@ func UpdateCartItem(ctx context.Context, updatedCartItem *models.CartItem) (*mod
 		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
 	}
 	// Invalidate the cache for the user's cart items.
-	_, err = CartItemsCacheKeyspace.Delete(ctx, strconv.Itoa(updatedCartItem.UserID))
+	_, err = CartItemsCacheKeyspace.Delete(ctx, updatedCartItem.UserID)
 	if err != nil {
 		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
 	}
@@ -145,7 +144,7 @@ func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestStatu
 		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
 	}
 	// Invalidate the cache for the user's cart items.
-	_, err = CartItemsCacheKeyspace.Delete(ctx, strconv.Itoa(id))
+	_, err = CartItemsCacheKeyspace.Delete(ctx, id)
 	if err != nil {
 		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
 	}
