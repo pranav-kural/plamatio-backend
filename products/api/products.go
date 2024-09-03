@@ -243,19 +243,10 @@ func GetBySubCategory(ctx context.Context, id int) (*models.Products, error) {
 	return r, err
 }
 
-// GET: /products/hero?category=:id
+// GET: /products/hero
 // Retrieves all hero products from the database.
-// If a category ID is provided, retrieves hero products by category.
-// If no category ID is provided, retrieves all hero products.
-//encore:api auth method=GET path=/products/hero?category=:id
-func GetHeroProducts(ctx context.Context, category int) (*models.Products, error) {
-
-	// If category ID is provided and is valid
-	if category > 0 && category <= 3 {
-	 return GetHeroProductsByCategory(ctx, category)
-	}
-
-	// If no category ID is provided, retrieve all hero products
+//encore:api auth method=GET path=/products/hero
+func GetHeroProducts(ctx context.Context) (*models.Products, error) {
 	// First, try retrieving all hero products from cache if they exist.
 	c, err := HeroProductsCacheKeyspace.Get(ctx, "all")
 	// if hero products are found (i.e., no error), return them
@@ -275,8 +266,9 @@ func GetHeroProducts(ctx context.Context, category int) (*models.Products, error
 	return r, err
 }
 
-// GET: /products/hero?category=:id
+// GET: /products/hero/category/:category
 // Retrieves all hero products from the database by category.
+//encore:api auth method=GET path=/products/hero/category/:category
 func GetHeroProductsByCategory(ctx context.Context, category int) (*models.Products, error) {
 	c, err := HeroProductsCacheKeyspace.Get(ctx, string(rune(category)))
 	// if hero products are found (i.e., no error), return them

@@ -9,12 +9,12 @@ CREATE INDEX idx_sub_category_id_products ON products (sub_category_id);
 
 CREATE INDEX idx_category_id_category_hero_products ON category_hero_products (category_id);
 
-CREATE INDEX idx_uid_users ON users (id);
+CREATE INDEX idx_user_id_users ON users (id);
 
-CREATE INDEX idx_uid_addresses ON addresses (uid);
+CREATE INDEX idx_user_id_addresses ON addresses (user_id);
 
-CREATE INDEX idx_uid_cart_items ON cart_items (uid);
+CREATE INDEX idx_user_id_cart_items ON cart_items (user_id);
 
-CREATE INDEX idx_uid_orders ON orders (uid);
+CREATE INDEX idx_user_id_orders ON orders (user_id);
 
 CREATE INDEX idx_order_id_order_items ON order_items (order_id);
