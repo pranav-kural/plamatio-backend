@@ -15,7 +15,7 @@ type SubCategory struct {
 	ID          int    `json:"id"` // unique identifier
 	Name        string `json:"name"` // name of the sub-category
 	Description string `json:"description"` // description of the sub-category
-	CategoryID  int    `json:"category"` // category ID of the sub-category
+	CategoryId  int    `json:"category"` // category ID of the sub-category
 	Offered     bool   `json:"offered"` // whether the sub-category is offered
 }
 
