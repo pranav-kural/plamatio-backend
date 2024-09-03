@@ -1,7 +1,8 @@
 CREATE TABLE users (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL
+    last_name TEXT NOT NULL,
+    ref_id TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE addresses (

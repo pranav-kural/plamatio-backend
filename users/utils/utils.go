@@ -40,7 +40,21 @@ func ValidateNewUserData(user *models.UserRequestParams) error {
 	if user.LastName == "" {
 		return errors.New("missing last name")
 	}
+	if user.RefID == "" {
+		return errors.New("missing reference ID")
+	}
 	return nil
+}
+
+func ValidateUpdateUserData(user *models.User) error {
+	if user.ID <= 0 {
+		return errors.New("invalid user ID")
+	}
+	return ValidateNewUserData(&models.UserRequestParams{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		RefID:     user.RefID,
+	})
 }
 
 func ValidateUpdateAddressData(address *models.Address) error {

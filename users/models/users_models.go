@@ -5,7 +5,8 @@ package users
 CREATE TABLE users (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL
+    last_name TEXT NOT NULL,
+		ref_id TEXT NOT NULL,
 );
 
 CREATE TABLE addresses (
@@ -25,6 +26,7 @@ type User struct {
 	ID        int    `json:"id"` // unique identifier
 	FirstName string `json:"firstName"` // first name of the user
 	LastName  string `json:"lastName"` // last name of the user
+	RefID     string `json:"refId"` // reference ID
 }
 
 type Address struct {
@@ -48,6 +50,7 @@ type Addresses struct {
 type UserRequestParams struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
+	RefID     string `json:"refId"`
 }
 
 type AddressRequestParams struct {
