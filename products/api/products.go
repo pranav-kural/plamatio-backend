@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	categoriesModels "encore.app/categories/models"
 	db "encore.app/products/db"
 	models "encore.app/products/models"
 	"encore.dev/beta/auth"
@@ -44,6 +43,13 @@ var ProductCategoryCacheKeyspace = cache.NewStructKeyspace[int, models.Products]
 	KeyPattern:    "product-category-cache/:key",
 	DefaultExpiry: cache.ExpireIn(24 * time.Hour),
 })
+
+// Product Sub-category Cache Keyspace to store products by category.
+var ProductSubCategoryCacheKeyspace = cache.NewStructKeyspace[int, models.Products](ProductsCluster, cache.KeyspaceConfig{
+	KeyPattern:    "product-sub-category-cache/:key",
+	DefaultExpiry: cache.ExpireIn(24 * time.Hour),
+})
+
 
 // Product Search Cache Keyspace to store product search results by query.
 var ProductSearchCacheKeyspace = cache.NewStructKeyspace[string, models.Products](ProductsCluster, cache.KeyspaceConfig{
@@ -122,7 +128,16 @@ func Insert(ctx context.Context, p *models.ProductRequestParams) (*models.Produc
 		return nil, err
 	} else {
 		// Return the product.
-		return &models.Product{ID: id, Name: p.Name, Description: p.Description, CategoryId: categoriesModels.ProductCategory(p.CategoryId), ImageURL: p.ImageURL, Price: p.Price}, nil
+		return &models.Product{
+			ID: id, 
+			Name: p.Name, 
+			Description: p.Description, 
+			CategoryId: p.CategoryId, 
+			SubCategoryId: p.SubCategoryId, 
+			ImageURL: p.ImageURL, 
+			Price: p.Price, 
+			PreviousPrice: p.PreviousPrice, 
+			Offered: p.Offered}, nil
 	}
 }
 
@@ -147,7 +162,16 @@ func Update(ctx context.Context, id int, p *models.ProductRequestParams) (*model
 		return nil, err
 	}
 	// Return the updated product.
-	return &models.Product{ID: id, Name: p.Name, Description: p.Description, CategoryId: categoriesModels.ProductCategory(p.CategoryId), ImageURL: p.ImageURL, Price: p.Price}, nil
+	return &models.Product{
+			ID: id, 
+			Name: p.Name, 
+			Description: p.Description, 
+			CategoryId: p.CategoryId, 
+			SubCategoryId: p.SubCategoryId, 
+			ImageURL: p.ImageURL, 
+			Price: p.Price, 
+			PreviousPrice: p.PreviousPrice, 
+			Offered: p.Offered}, nil
 }
 
 // GET: /products/all
@@ -196,10 +220,42 @@ func GetByCategory(ctx context.Context, id int) (*models.Products, error) {
 	return r, err
 }
 
-// GET: /products/hero-products
+// GET: /products/subcategory/:id
+// Retrieves all products from the database by sub-category.
+//encore:api auth method=GET path=/products/subcategory/:id
+func GetBySubCategory(ctx context.Context, id int) (*models.Products, error) {
+	// First, try retrieving all products from cache if they exist.
+	c, err := ProductSubCategoryCacheKeyspace.Get(ctx, id)
+	// if products are found (i.e., no error), return them
+	if err == nil {
+		return &c, nil
+	}
+	// If the products are not found in cache, retrieve them from the database.
+	r, err := ProductsTB.GetBySubCategory(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// Cache the products.
+	if err := ProductSubCategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
+		return nil, err
+	}
+	// Return the products.
+	return r, err
+}
+
+// GET: /products/hero?category=:id
 // Retrieves all hero products from the database.
-//encore:api auth method=GET path=/products/hero
-func GetHeroProducts(ctx context.Context) (*models.Products, error) {
+// If a category ID is provided, retrieves hero products by category.
+// If no category ID is provided, retrieves all hero products.
+//encore:api auth method=GET path=/products/hero?category=:id
+func GetHeroProducts(ctx context.Context, category int) (*models.Products, error) {
+
+	// If category ID is provided and is valid
+	if category > 0 && category <= 3 {
+	 return GetHeroProductsByCategory(ctx, category)
+	}
+
+	// If no category ID is provided, retrieve all hero products
 	// First, try retrieving all hero products from cache if they exist.
 	c, err := HeroProductsCacheKeyspace.Get(ctx, "all")
 	// if hero products are found (i.e., no error), return them
@@ -213,6 +269,27 @@ func GetHeroProducts(ctx context.Context) (*models.Products, error) {
 	}
 	// Cache the hero products.
 	if err := HeroProductsCacheKeyspace.Set(ctx, "all", *r); err != nil {
+		return nil, err
+	}
+	// Return the products.
+	return r, err
+}
+
+// GET: /products/hero?category=:id
+// Retrieves all hero products from the database by category.
+func GetHeroProductsByCategory(ctx context.Context, category int) (*models.Products, error) {
+	c, err := HeroProductsCacheKeyspace.Get(ctx, string(rune(category)))
+	// if hero products are found (i.e., no error), return them
+	if err == nil {
+		return &c, nil
+	}
+	// If the hero products are not found in cache, retrieve them from the database.
+	r, err := ProductsTB.GetCategoryHeroProducts(ctx, category)
+	if err != nil {
+		return nil, err
+	}
+	// Cache the hero products by category.
+	if err := HeroProductsCacheKeyspace.Set(ctx, string(rune(category)), *r); err != nil {
 		return nil, err
 	}
 	// Return the products.
