@@ -6,6 +6,7 @@ import (
 
 	db "encore.app/users/db"
 	models "encore.app/users/models"
+	rlog "encore.dev/rlog"
 	"encore.dev/storage/cache"
 	"encore.dev/storage/sqldb"
 )
@@ -60,7 +61,8 @@ func GetUser(ctx context.Context, id int) (*models.User, error) {
 	}
 	// Cache the user.
 	if err := UserCacheKeyspace.Set(ctx, id, *r); err != nil {
-		return nil, err
+		// Log the error
+		rlog.Error("error caching user data", err)
 	}
 	// Return the user.
 	return r, err
@@ -83,7 +85,8 @@ func GetUserByRefID(ctx context.Context, id string) (*models.User, error) {
 	}
 	// Cache the user.
 	if err := RefUserCacheKeyspace.Set(ctx, id, *r); err != nil {
-		return nil, err
+		// Log the error
+		rlog.Error("error caching user data", err)
 	}
 	// Return the user.
 	return r, err
@@ -127,13 +130,14 @@ func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChan
 	// Invalidate the cache for the user.
 	_, err = UserCacheKeyspace.Delete(ctx, updatedUser.ID)
 	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
+		// Log the error
+		rlog.Error("error deleting user cache", err)
 	}
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
 	// Return the user.
-	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, nil
+	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, err
 }
 
 // DELETE: /users/delete/:id
@@ -148,11 +152,12 @@ func DeleteUser(ctx context.Context, id int) (*models.UserChangeRequestStatus, e
 	// Invalidate the cache for the user.
 	_, err = UserCacheKeyspace.Delete(ctx, id)
 	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
+		// Log the error
+		rlog.Error("error deleting user cache", err)
 	}
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
 	// Return the user.
-	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, nil
+	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, err
 }

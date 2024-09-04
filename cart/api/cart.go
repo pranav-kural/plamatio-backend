@@ -7,6 +7,7 @@ import (
 
 	db "encore.app/cart/db"
 	models "encore.app/cart/models"
+	rlog "encore.dev/rlog"
 	"encore.dev/storage/cache"
 	"encore.dev/storage/sqldb"
 )
@@ -61,7 +62,8 @@ func GetCartItem(ctx context.Context, id int) (*models.CartItem, error) {
 	}
 	// Cache the cart item.
 	if err := CartItemCacheKeyspace.Set(ctx, id, *r); err != nil {
-		return nil, err
+		// log error
+		rlog.Error("Error caching cart item", err)
 	}
 	// Return the cart item.
 	return r, err
@@ -88,7 +90,8 @@ func GetCartItems(ctx context.Context, user_id int) (*models.CartItems, error) {
 	}
 	// Cache the cart items.
 	if err := CartItemsCacheKeyspace.Set(ctx, user_id, *r); err != nil {
-		return nil, err
+		// log error
+		rlog.Error("Error caching user cart items", err)
 	}
 	// Return the cart items.
 	return r, err
@@ -106,12 +109,13 @@ func AddCartItem(ctx context.Context, newCartItem *models.NewCartItem) (*models.
 	// Invalidate the cache for the user's cart items.
 	_, err = CartItemsCacheKeyspace.Delete(ctx, newCartItem.UserID)
 	if err != nil {
-		return nil, err
+		// log error
+		rlog.Error("Error deleting user cart items cache", err)
 	}
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
-	return r, nil
+	return r, err
 }
 
 // PUT: /cart/update
@@ -126,12 +130,13 @@ func UpdateCartItem(ctx context.Context, updatedCartItem *models.CartItem) (*mod
 	// Invalidate the cache for the user's cart items.
 	_, err = CartItemsCacheKeyspace.Delete(ctx, updatedCartItem.UserID)
 	if err != nil {
-		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
+		// log error
+		rlog.Error("Error deleting user cart items cache", err)
 	}
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
-	return &models.CartChangeRequestStatus{Status: models.CartRequestSuccess}, nil
+	return &models.CartChangeRequestStatus{Status: models.CartRequestSuccess}, err
 }
 
 // DELETE: /cart/delete/:id
@@ -146,10 +151,11 @@ func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestStatu
 	// Invalidate the cache for the user's cart items.
 	_, err = CartItemsCacheKeyspace.Delete(ctx, id)
 	if err != nil {
-		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
+		// log error
+		rlog.Error("Error deleting user cart items cache", err)
 	}
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
-	return &models.CartChangeRequestStatus{Status: models.CartRequestSuccess}, nil
+	return &models.CartChangeRequestStatus{Status: models.CartRequestSuccess}, err
 }
