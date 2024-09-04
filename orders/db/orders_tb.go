@@ -81,14 +81,18 @@ func (tb *OrdersTable) GetOrdersByUser(ctx context.Context, userId int) (*models
 }
 
 // Inserts an order into the database.
-func (tb *OrdersTable) InsertOrder(ctx context.Context, o *models.OrderRequestParams) (int, error) {
+func (tb *OrdersTable) InsertOrder(ctx context.Context, o *models.OrderRequestParams) (*models.Order, error) {
 	// validate data
 	if err := utils.ValidateNewOrderData(o); err != nil {
-		return 0, err
+		return nil, err
 	}
+	// insert order
 	var id int
 	err := tb.DB.QueryRow(ctx, SQL_INSERT_ORDER, o.UserID, o.AddressID, o.TotalPrice, o.CreatedAt, o.Status).Scan(&id)
-	return id, err
+	if err != nil {
+		return nil, err
+	}
+	return &models.Order{ID: id, UserID: o.UserID, AddressID: o.AddressID, TotalPrice: o.TotalPrice, CreatedAt: o.CreatedAt, Status: o.Status}, nil
 }
 
 // Updates an order in the database.

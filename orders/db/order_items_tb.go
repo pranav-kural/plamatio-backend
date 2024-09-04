@@ -81,14 +81,17 @@ func (tb *OrderItemsTable) GetOrderItemsByOrder(ctx context.Context, orderId int
 }
 
 // Inserts an order item into the database.
-func (tb *OrderItemsTable) InsertOrderItem(ctx context.Context, oi *models.OrderItemRequestParams) (int, error) {
+func (tb *OrderItemsTable) InsertOrderItem(ctx context.Context, oi *models.OrderItemRequestParams) (*models.OrderItem, error) {
 	// validate data
 	if err := utils.ValidateNewOrderItemData(oi); err != nil {
-		return 0, err
+		return nil, err
 	}
-	var id int
-	err := tb.DB.QueryRow(ctx, SQL_INSERT_ORDER_ITEM, oi.OrderID, oi.ProductID, oi.Quantity).Scan(&id)
-	return id, err
+	var oiID int
+	err := tb.DB.QueryRow(ctx, SQL_INSERT_ORDER_ITEM, oi.OrderID, oi.ProductID, oi.Quantity).Scan(&oiID)
+	if err != nil {
+		return nil, err
+	}
+	return &models.OrderItem{ID: oiID, OrderID: oi.OrderID, ProductID: oi.ProductID, Quantity: oi.Quantity}, nil
 }
 
 // Updates an order item in the database.

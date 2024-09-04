@@ -24,6 +24,15 @@ type OrderItems struct {
 	Data []*OrderItem `json:"data"`
 }
 
+type DetailedOrder struct {
+	Order *Order `json:"order"`
+	Items []*OrderItem `json:"items"`
+}
+
+type DetailedOrders struct {
+	Data []*DetailedOrder `json:"data"`
+}
+
 type OrderRequestParams struct {
 	UserID    int    `json:"user_id"`
 	AddressID int    `json:"address_id"`
@@ -36,6 +45,10 @@ type OrderItemRequestParams struct {
 	OrderID  int `json:"order_id"`
 	ProductID int `json:"product_id"`
 	Quantity int `json:"quantity"`
+}
+
+type OrderRequestStatus struct {
+	Status string `json:"status"`
 }
 
 const (
