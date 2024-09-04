@@ -26,9 +26,9 @@ var SubCategoriesCacheKeyspace = cache.NewStructKeyspace[string, models.SubCateg
 // ------------------------------------------------------
 // Setup API
 
-// GET: /subcategories/get/:id
+// GET: /categories/subcategories/get/:id
 // Retrieves the sub-category from the database with the given ID.
-//encore:api auth method=GET path=/subcategories/get/:id
+//encore:api auth method=GET path=/categories/subcategories/get/:id
 func GetSubCategory(ctx context.Context, id int) (*models.SubCategory, error) {
 	// First, try retrieving the sub-category from cache if it exists.
 	c, err := SubCategoryCacheKeyspace.Get(ctx, id)
@@ -49,9 +49,9 @@ func GetSubCategory(ctx context.Context, id int) (*models.SubCategory, error) {
 	return r, err
 }
 
-// GET: /subcategories/all
+// GET: /categories/subcategories/all
 // Retrieves all sub-categories from the database.
-//encore:api auth method=GET path=/subcategories/all
+//encore:api auth method=GET path=/categories/subcategories/all
 func GetSubCategories(ctx context.Context) (*models.SubCategories, error) {
 	// First, try retrieving all sub-categories from cache if they exist.
 	c, err := SubCategoriesCacheKeyspace.Get(ctx, "all")

@@ -39,9 +39,9 @@ var UserAddressesCacheKeyspace = cache.NewStructKeyspace[int, models.Addresses](
 // ------------------------------------------------------
 // Setup API
 
-// GET: /addresses/get/:id
+// GET: /users/addresses/get/:id
 // Retrieves the address from the database with the given ID.
-//encore:api auth method=GET path=/addresses/get/:id
+//encore:api auth method=GET path=/users/addresses/get/:id
 func GetAddress(ctx context.Context, id int) (*models.Address, error) {
 	// First, try retrieving the address from cache if it exists.
 	a, err := AddressCacheKeyspace.Get(ctx, id)
@@ -62,32 +62,32 @@ func GetAddress(ctx context.Context, id int) (*models.Address, error) {
 	return r, err
 }
 
-// GET: /addresses/get/user/:id
+// GET: /users/addresses/get/user/:user_id
 // Retrieves all addresses for a user from the database with the given user ID.
-//encore:api auth method=GET path=/addresses/users/:id
-func GetUserAddresses(ctx context.Context, id int) (*models.Addresses, error) {
+//encore:api auth method=GET path=/users/addresses/user/:user_id
+func GetUserAddresses(ctx context.Context, user_id int) (*models.Addresses, error) {
 	// First, try retrieving the user addresses from cache if it exists.
-	a, err := UserAddressesCacheKeyspace.Get(ctx, id)
+	a, err := UserAddressesCacheKeyspace.Get(ctx, user_id)
 	// if user addresses are found (i.e., no error), return them
 	if err == nil {
 		return &a, nil
 	}
 	// If the user addresses are not found in cache, retrieve them from the database.
-	r, err := AddressesTable.GetUserAddresses(ctx, id)
+	r, err := AddressesTable.GetUserAddresses(ctx, user_id)
 	if err != nil {
 		return nil, err
 	}
 	// Cache the user addresses.
-	if err := UserAddressesCacheKeyspace.Set(ctx, id, *r); err != nil {
+	if err := UserAddressesCacheKeyspace.Set(ctx, user_id, *r); err != nil {
 		return nil, err
 	}
 	// Return the user addresses.
 	return r, err
 }
 
-// POST: /addresses/add
+// POST: /users/addresses/add
 // Inserts an address into the database.
-//encore:api auth method=POST path=/addresses/add
+//encore:api auth method=POST path=/users/addresses/add
 func AddAddress(ctx context.Context, newAddress *models.AddressRequestParams) (*models.Address, error) {
 	// Insert the address into the database.
 	r, err := AddressesTable.InsertAddress(ctx, newAddress)
@@ -98,9 +98,9 @@ func AddAddress(ctx context.Context, newAddress *models.AddressRequestParams) (*
 	return r, nil
 }
 
-// PUT: /addresses/update
+// PUT: /users/addresses/update
 // Updates an address in the database.
-//encore:api auth method=PUT path=/addresses/update
+//encore:api auth method=PUT path=/users/addresses/update
 func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models.UserChangeRequestStatus, error) {
 	// Update the address in the database.
 	err := AddressesTable.UpdateAddress(ctx, updatedAddress)
@@ -125,9 +125,9 @@ func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models
 	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, nil
 }
 
-// DELETE: /addresses/delete/:id
+// DELETE: /users/addresses/delete/:id
 // Deletes an address from the database.
-//encore:api auth method=DELETE path=/addresses/delete/:id
+//encore:api auth method=DELETE path=/users/addresses/delete/:id
 func DeleteAddress(ctx context.Context, id int) (*models.UserChangeRequestStatus, error) {
 	// Delete the address from the database.
 	err := AddressesTable.DeleteAddress(ctx, id)

@@ -44,9 +44,9 @@ Primary endpoints for orders:
 - DELETE: /orders/delete/:id
 */
 
-// GET: /order/items/get/:id
+// GET: /orders/items/get/:id
 // Retrieves the order item from the database with the given ID.
-//encore:api auth method=GET path=/order/items/get/:id
+//encore:api auth method=GET path=/orders/items/get/:id
 func GetOrderItem(ctx context.Context, id int) (*models.OrderItem, error) {
 	// First, try retrieving the order item from cache if it exists.
 	c, err := OrderItemCacheKeyspace.Get(ctx, id)
@@ -68,9 +68,9 @@ func GetOrderItem(ctx context.Context, id int) (*models.OrderItem, error) {
 	return r, err
 }
 
-// GET: /order/items/all/:order_id
+// GET: /orders/items/all/:order_id
 // Retrieves all order items for an order from the database.
-//encore:api auth method=GET path=/order/items/all/:order_id
+//encore:api auth method=GET path=/orders/items/all/:order_id
 func GetOrderItems(ctx context.Context, order_id int) (*models.OrderItems, error) {
 	// First, try retrieving all order items for an order from cache if they exist.
 	c, err := OrderItemsCacheKeyspace.Get(ctx, order_id)
@@ -92,9 +92,9 @@ func GetOrderItems(ctx context.Context, order_id int) (*models.OrderItems, error
 	return r, err
 }
 
-// POST: /order/items/add
+// POST: /orders/items/add
 // Inserts an order item into the database.
-//encore:api auth method=POST path=/order/items/add
+//encore:api auth method=POST path=/orders/items/add
 func AddOrderItem(ctx context.Context, oi *models.OrderItemRequestParams) (*models.OrderItem, error) {
 	// Insert the order item into the database.
 	noi, err := OrderItemsTable.InsertOrderItem(ctx, oi)
@@ -113,9 +113,9 @@ func AddOrderItem(ctx context.Context, oi *models.OrderItemRequestParams) (*mode
 	return noi, err
 }
 
-// PUT: /order/items/update
+// PUT: /orders/items/update
 // Updates an order item in the database.
-//encore:api auth method=PUT path=/order/items/update
+//encore:api auth method=PUT path=/orders/items/update
 func UpdateOrderItem(ctx context.Context, oi *models.OrderItem) (*models.OrderRequestStatus, error) {
 	// Update the order item in the database.
 	err := OrderItemsTable.UpdateOrderItem(ctx, oi)
@@ -134,9 +134,9 @@ func UpdateOrderItem(ctx context.Context, oi *models.OrderItem) (*models.OrderRe
 	return &models.OrderRequestStatus{Status: models.OrderRequestSuccess}, err
 }
 
-// DELETE: /order/items/delete/:id
+// DELETE: /orders/items/delete/:id
 // Deletes an order item from the database.
-//encore:api auth method=DELETE path=/order/items/delete/:id
+//encore:api auth method=DELETE path=/orders/items/delete/:id
 func DeleteOrderItem(ctx context.Context, id int) (*models.OrderRequestStatus, error) {
 	// Delete the order item from the database.
 	err := OrderItemsTable.DeleteOrderItem(ctx, id)

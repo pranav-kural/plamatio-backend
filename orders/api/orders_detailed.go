@@ -16,9 +16,9 @@ Primary endpoints to get orders with order items:
 - GET: /orders/detailed/all/:user_id
 */
 
-// GET: /order/detailed/get/:order_id
+// GET: /orders/detailed/get/:order_id
 // Retrieves the order with order items from the database with the given ID.
-//encore:api auth method=GET path=/order/detailed/get/:order_id
+//encore:api auth method=GET path=/orders/detailed/get/:order_id
 func GetDetailedOrder(ctx context.Context, order_id int) (*models.DetailedOrder, error) {
 	// Retrieve the order from the database.
 	order, err := GetOrder(ctx, order_id)
@@ -42,9 +42,9 @@ func GetDetailedOrder(ctx context.Context, order_id int) (*models.DetailedOrder,
 	return &models.DetailedOrder{Order: order, Items: orderItems.Data}, nil
 }
 
-// GET: /order/detailed/all/:user_id
+// GET: /orders/detailed/all/:user_id
 // Retrieves all orders with order items for a user from the database.
-//encore:api auth method=GET path=/order/detailed/all/:user_id
+//encore:api auth method=GET path=/orders/detailed/all/:user_id
 func GetDetailedOrders(ctx context.Context, user_id int) (*models.DetailedOrders, error) {
 	// Retrieve all orders for a user from the database.
 	orders, err := GetOrders(ctx, user_id)

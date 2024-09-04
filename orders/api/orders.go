@@ -56,9 +56,9 @@ Primary endpoints for orders:
 
 */
 
-// GET: /order/get/:id
+// GET: /orders/get/:id
 // Retrieves the order from the database with the given ID.
-//encore:api auth method=GET path=/order/get/:id
+//encore:api auth method=GET path=/orders/get/:id
 func GetOrder(ctx context.Context, id int) (*models.Order, error) {
 	// First, try retrieving the order from cache if it exists.
 	c, err := OrderCacheKeyspace.Get(ctx, id)
@@ -80,9 +80,9 @@ func GetOrder(ctx context.Context, id int) (*models.Order, error) {
 	return r, err
 }
 
-// GET: /order/all/:user_id
+// GET: /orders/all/:user_id
 // Retrieves all orders for a user from the database.
-//encore:api auth method=GET path=/order/all/:user_id
+//encore:api auth method=GET path=/orders/all/:user_id
 func GetOrders(ctx context.Context, user_id int) (*models.Orders, error) {
 	// First, try retrieving all orders for a user from cache if they exist.
 	c, err := UserOrdersCacheKeyspace.Get(ctx, user_id)
@@ -104,9 +104,9 @@ func GetOrders(ctx context.Context, user_id int) (*models.Orders, error) {
 	return r, err
 }
 
-// POST: /order/add
+// POST: /orders/add
 // Inserts an order into the database.
-//encore:api auth method=POST path=/order/add
+//encore:api auth method=POST path=/orders/add
 func AddOrder(ctx context.Context, o *models.OrderRequestParams) (*models.Order, error) {
 	// Insert the order into the database.
 	or, err := OrdersTable.InsertOrder(ctx, o)
@@ -125,9 +125,9 @@ func AddOrder(ctx context.Context, o *models.OrderRequestParams) (*models.Order,
 	return or, err
 }
 
-// PUT: /order/update
+// PUT: /orders/update
 // Updates an order in the database.
-//encore:api auth method=PUT path=/order/update
+//encore:api auth method=PUT path=/orders/update
 func UpdateOrder(ctx context.Context, o *models.Order) (*models.OrderRequestStatus, error) {
 	// Update the order in the database.
 	err := OrdersTable.UpdateOrder(ctx, o)
@@ -146,9 +146,9 @@ func UpdateOrder(ctx context.Context, o *models.Order) (*models.OrderRequestStat
 	return &models.OrderRequestStatus{Status: models.OrderRequestSuccess}, err
 }
 
-// DELETE: /order/delete/:id
+// DELETE: /orders/delete/:id
 // Deletes an order from the database.
-//encore:api auth method=DELETE path=/order/delete/:id
+//encore:api auth method=DELETE path=/orders/delete/:id
 func DeleteOrder(ctx context.Context, id int) (*models.OrderRequestStatus, error) {
 	// Delete the order from the database.
 	err := OrdersTable.DeleteOrder(ctx, id)
