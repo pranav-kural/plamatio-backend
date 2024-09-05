@@ -14,11 +14,11 @@ import (
 // ------------------------------------------------------
 // Setup Database
 
-// ProductDB instance.
-var ProductsDB = sqldb.Named("products")
+// Database instance for Plamatio Backend.
+var PlamatioDB = sqldb.Named("plamatio_db")
 
 // UsersTable instance.
-var UsersTable = &db.UsersTable{DB: ProductsDB}
+var UsersTable = &db.UsersTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching

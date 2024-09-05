@@ -13,7 +13,7 @@ import (
 // ------------------------------------------------------
 // Setup Database
 // SubCategoriesTable instance.
-var SubCategoriesTable = &db.SubCategoriesTable{DB: ProductsDB}
+var SubCategoriesTable = &db.SubCategoriesTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching

@@ -7,8 +7,6 @@ import (
 
 	db "encore.app/products/db"
 	models "encore.app/products/models"
-	"encore.dev/beta/auth"
-	"encore.dev/beta/errs"
 	rlog "encore.dev/rlog"
 	"encore.dev/storage/cache"
 	"encore.dev/storage/sqldb"
@@ -17,13 +15,11 @@ import (
 // ------------------------------------------------------
 // Setup Database
 
-// Create a new database instance for the products database.
-var ProductsDB = sqldb.NewDatabase("products", sqldb.DatabaseConfig{
-		Migrations: "./migrations",
-	})
+// Database instance for Plamatio Backend.
+var PlamatioDB = sqldb.Named("plamatio_db")
 
 // ProductsTB is the products table instance.
-var ProductsTB = &db.ProductsTB{DB: ProductsDB}
+var ProductsTB = &db.ProductsTB{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -70,29 +66,6 @@ var HeroProductsCacheKeyspace = cache.NewStructKeyspace[string, models.Products]
 	KeyPattern:    "hero-products-cache/:key",
 	DefaultExpiry: cache.ExpireIn(24 * time.Hour),
 })
-
-// ------------------------------------------------------
-// Setup Authentication
-
-// secrets struct for API-key authentication.
-var secrets struct {
-    PlamatioWebFrontendApiKey string    // API key for the Plamatio Web Frontend
-}
-
-// AuthHandler - authentication handler to validate API key for authenticated endpoints.
-//encore:authhandler
-func AuthHandler(ctx context.Context, token string) (auth.UID, error) {
-    // Validate the token - confirm it matches the API key.
-		if token == secrets.PlamatioWebFrontendApiKey {
-			// Return nil if the token is valid.
-			return auth.UID("authenticated"), nil
-		}
-		// Return an error if API key is invalid.
-		return "", &errs.Error{
-        Code: errs.Unauthenticated,
-        Message: "invalid API key",	
-    }
-}
 
 // ------------------------------------------------------
 // Setup API

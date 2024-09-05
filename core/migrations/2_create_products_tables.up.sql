@@ -27,3 +27,9 @@ CREATE TABLE category_hero_products (
     FOREIGN KEY (sub_category_id) REFERENCES sub_categories(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+CREATE INDEX idx_product_id ON products (id);
+CREATE INDEX idx_category_id_products ON products (category_id);
+CREATE INDEX idx_sub_category_id_products ON products (sub_category_id);
+
+CREATE INDEX idx_category_id_category_hero_products ON category_hero_products (category_id);

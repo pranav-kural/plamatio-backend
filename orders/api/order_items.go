@@ -14,7 +14,7 @@ import (
 // Setup Database
 
 // OrderItemsTable instance.
-var OrderItemsTable = &db.OrderItemsTable{DB: ProductsDB}
+var OrderItemsTable = &db.OrderItemsTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching

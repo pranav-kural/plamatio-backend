@@ -14,7 +14,7 @@ import (
 // Setup Database
 
 // UsersTable instance.
-var AddressesTable = &db.AddressesTable{DB: ProductsDB}
+var AddressesTable = &db.AddressesTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
