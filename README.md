@@ -4,6 +4,11 @@ Plamatio is a production-ready E-commerce store focused on Llama-inspired produc
 
 [Plamatio Backend Documentation](https://pkural.notion.site/Plamatio-Backend-Documentation-d8c426f7851546c19df095c7fbf72282)
 
+![Plamatio Backend Deployment - Staging](https://img.shields.io/github/deployments/pranav-kural/plamatio-backend/staging?label=staging)
+![Plamatio Backend Deployment - Production](https://img.shields.io/github/deployments/pranav-kural/plamatio-backend/prod?label=production)
+
+
+
 ## Primary Features
 
 - **Distributed REST API:** Plamatio backend consists of multiple distributed modularized REST API services, each with its Redis cache and PostgreSQL database. This distributed architecture allows for maximal scalability, reduced development and maintenance complexity, and increased productivity in fixing issues and releasing feature updates.
