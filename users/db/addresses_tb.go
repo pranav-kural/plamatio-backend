@@ -41,7 +41,7 @@ func (tb *AddressesTable) GetAddress(ctx context.Context, id int) (*models.Addre
 }
 
 // Retrieves all addresses for a user from the database.
-func (tb *AddressesTable) GetUserAddresses(ctx context.Context, userID int) (*models.Addresses, error) {
+func (tb *AddressesTable) GetUserAddresses(ctx context.Context, userID string) (*models.Addresses, error) {
 	rows, err := tb.DB.Query(ctx, SQL_GET_USER_ADDRESSES, userID)
 	if err != nil {
 		return nil, err
