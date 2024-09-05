@@ -6,6 +6,7 @@ import (
 
 	db "encore.app/users/db"
 	models "encore.app/users/models"
+	rlog "encore.dev/rlog"
 	"encore.dev/storage/cache"
 )
 
@@ -13,7 +14,7 @@ import (
 // Setup Database
 
 // UsersTable instance.
-var AddressesTable = &db.AddressesTable{DB: ProductsDB}
+var AddressesTable = &db.AddressesTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -31,7 +32,7 @@ var AddressCacheKeyspace = cache.NewStructKeyspace[int, models.Address](Addresse
 })
 
 // User Addresses Cache Keyspace to store address data by user ID.
-var UserAddressesCacheKeyspace = cache.NewStructKeyspace[int, models.Addresses](AddressesCluster, cache.KeyspaceConfig{
+var UserAddressesCacheKeyspace = cache.NewStructKeyspace[string, models.Addresses](AddressesCluster, cache.KeyspaceConfig{
 	KeyPattern:    "user-addresses-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
@@ -54,10 +55,14 @@ func GetAddress(ctx context.Context, id int) (*models.Address, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the address.
-	if err := AddressCacheKeyspace.Set(ctx, id, *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the address.
+	go func() {
+		// Cache the address.
+		if err := AddressCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// Log the error
+			rlog.Error("error caching address", err)
+		}
+	}()
 	// Return the address.
 	return r, err
 }
@@ -65,7 +70,7 @@ func GetAddress(ctx context.Context, id int) (*models.Address, error) {
 // GET: /users/addresses/get/user/:user_id
 // Retrieves all addresses for a user from the database with the given user ID.
 //encore:api auth method=GET path=/users/addresses/user/:user_id
-func GetUserAddresses(ctx context.Context, user_id int) (*models.Addresses, error) {
+func GetUserAddresses(ctx context.Context, user_id string) (*models.Addresses, error) {
 	// First, try retrieving the user addresses from cache if it exists.
 	a, err := UserAddressesCacheKeyspace.Get(ctx, user_id)
 	// if user addresses are found (i.e., no error), return them
@@ -77,10 +82,14 @@ func GetUserAddresses(ctx context.Context, user_id int) (*models.Addresses, erro
 	if err != nil {
 		return nil, err
 	}
-	// Cache the user addresses.
-	if err := UserAddressesCacheKeyspace.Set(ctx, user_id, *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the user addresses.
+	go func() {
+		// Cache the user addresses.
+		if err := UserAddressesCacheKeyspace.Set(ctx, user_id, *r); err != nil {
+			// Log the error
+			rlog.Error("error caching user addresses", err)
+		}
+	}()
 	// Return the user addresses.
 	return r, err
 }
@@ -107,17 +116,23 @@ func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models
 	if err != nil {
 		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
 	}
-	// Invalidate the cache for the address.
-	_, err = AddressCacheKeyspace.Delete(ctx, updatedAddress.ID)
-	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
-	}
+	
+	// Fire a go routine to invalidate the cache for the address.
+	go func() {
+		// Invalidate the cache for the address.
+		_, err = AddressCacheKeyspace.Delete(ctx, updatedAddress.ID)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting address cache", err)
+		}
 
-	// Invalidate the cache for the user addresses.
-	_, err = UserAddressesCacheKeyspace.Delete(ctx, updatedAddress.UserID)
-	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
-	}
+		// Invalidate the cache for the user addresses.
+		_, err = UserAddressesCacheKeyspace.Delete(ctx, updatedAddress.UserID)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting user addresses cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
@@ -125,26 +140,32 @@ func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models
 	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, nil
 }
 
-// DELETE: /users/addresses/delete/:id
+// DELETE: /users/addresses/delete
 // Deletes an address from the database.
-//encore:api auth method=DELETE path=/users/addresses/delete/:id
-func DeleteAddress(ctx context.Context, id int) (*models.UserChangeRequestStatus, error) {
+//encore:api auth method=DELETE path=/users/addresses/delete
+func DeleteAddress(ctx context.Context, params *models.DeleteAddressParams) (*models.UserChangeRequestStatus, error) {
+
 	// Delete the address from the database.
-	err := AddressesTable.DeleteAddress(ctx, id)
-	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
-	}
-	// Invalidate the cache for the address.
-	_, err = AddressCacheKeyspace.Delete(ctx, id)
+	err := AddressesTable.DeleteAddress(ctx, params.AddressID)
 	if err != nil {
 		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
 	}
 
-	// Invalidate the cache for the user addresses.
-	_, err = UserAddressesCacheKeyspace.Delete(ctx, id)
-	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
-	}
+	// Fire a go routine to invalidate the cache for the address.
+	go func() {
+		// Invalidate the cache for the address.
+		_, err = AddressCacheKeyspace.Delete(ctx, params.AddressID)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting address cache", err)
+		}
+		// Invalidate the cache for the user addresses.
+		_, err = UserAddressesCacheKeyspace.Delete(ctx, params.UserID)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting user addresses cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 

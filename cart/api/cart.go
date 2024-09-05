@@ -15,11 +15,11 @@ import (
 // ------------------------------------------------------
 // Setup Database
 
-// ProductDB instance.
-var ProductsDB = sqldb.Named("products")
+// Database instance for Plamatio Backend.
+var PlamatioDB = sqldb.Named("plamatio_db")
 
 // CartItemsTable instance.
-var CartItemsTable = &db.CartItemsTable{DB: ProductsDB}
+var CartItemsTable = &db.CartItemsTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -60,11 +60,14 @@ func GetCartItem(ctx context.Context, id int) (*models.CartItem, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the cart item.
-	if err := CartItemCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching cart item", err)
-	}
+	// Fire go routine to cache the cart item.
+	go func() {
+		// Cache the cart item.
+		if err := CartItemCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching cart item", err)
+		}
+	}()
 	// Return the cart item.
 	return r, err
 }
@@ -88,11 +91,14 @@ func GetCartItems(ctx context.Context, user_id int) (*models.CartItems, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the cart items.
-	if err := CartItemsCacheKeyspace.Set(ctx, user_id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching user cart items", err)
-	}
+	// Fire go routine to cache the cart items.
+	go func() {
+		// Cache the cart items.
+		if err := CartItemsCacheKeyspace.Set(ctx, user_id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching user cart items", err)
+		}
+	}()
 	// Return the cart items.
 	return r, err
 }
@@ -106,12 +112,15 @@ func AddCartItem(ctx context.Context, newCartItem *models.NewCartItem) (*models.
 	if err != nil {
 		return nil, err
 	}
-	// Invalidate the cache for the user's cart items.
-	_, err = CartItemsCacheKeyspace.Delete(ctx, newCartItem.UserID)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting user cart items cache", err)
-	}
+	// Fire go routine to invalidate the cache for the user's cart items.
+	go func() {
+		// Invalidate the cache for the user's cart items.
+		_, err = CartItemsCacheKeyspace.Delete(ctx, newCartItem.UserID)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting user cart items cache", err)
+		}
+	}()
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
@@ -127,12 +136,15 @@ func UpdateCartItem(ctx context.Context, updatedCartItem *models.CartItem) (*mod
 	if err != nil {
 		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
 	}
-	// Invalidate the cache for the user's cart items.
-	_, err = CartItemsCacheKeyspace.Delete(ctx, updatedCartItem.UserID)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting user cart items cache", err)
-	}
+	// Fire go routine to invalidate the cache for the user's cart items.
+	go func() {
+		// Invalidate the cache for the user's cart items.
+		_, err = CartItemsCacheKeyspace.Delete(ctx, updatedCartItem.UserID)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting user cart items cache", err)
+		}
+	}()
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
@@ -148,12 +160,15 @@ func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestStatu
 	if err != nil {
 		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
 	}
-	// Invalidate the cache for the user's cart items.
-	_, err = CartItemsCacheKeyspace.Delete(ctx, id)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting user cart items cache", err)
-	}
+	// Fire go routine to invalidate the cache for the user's cart items.
+	go func() {
+		// Invalidate the cache for the user's cart items.
+		_, err = CartItemsCacheKeyspace.Delete(ctx, id)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting user cart items cache", err)
+		}
+	}()
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 

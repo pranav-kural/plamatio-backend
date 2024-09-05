@@ -14,7 +14,7 @@ import (
 // Setup Database
 
 // OrderItemsTable instance.
-var OrderItemsTable = &db.OrderItemsTable{DB: ProductsDB}
+var OrderItemsTable = &db.OrderItemsTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -59,11 +59,14 @@ func GetOrderItem(ctx context.Context, id int) (*models.OrderItem, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the order item.
-	if err := OrderItemCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching order item", err)
-	}
+	// Fire go routine to cache the order item.
+	go func() {
+		// Cache the order item.
+		if err := OrderItemCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching order item", err)
+		}
+	}()
 	// Return the order item.
 	return r, err
 }
@@ -83,11 +86,14 @@ func GetOrderItems(ctx context.Context, order_id int) (*models.OrderItems, error
 	if err != nil {
 		return nil, err
 	}
-	// Cache the order items.
-	if err := OrderItemsCacheKeyspace.Set(ctx, order_id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching order items", err)
-	}
+	// Fire go routine to cache the order items.
+	go func() {
+		// Cache the order items.
+		if err := OrderItemsCacheKeyspace.Set(ctx, order_id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching order items", err)
+		}
+	}()
 	// Return the order items.
 	return r, err
 }
@@ -101,12 +107,15 @@ func AddOrderItem(ctx context.Context, oi *models.OrderItemRequestParams) (*mode
 	if err != nil {
 		return nil, err
 	}
-	// Invalidate the cache for the order's order items.
-	_, err = OrderItemsCacheKeyspace.Delete(ctx, oi.OrderID)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting order items cache", err)
-	}
+	// Fire go routine to invalidate the cache for the order's order items.
+	go func() {
+		// Invalidate the cache for the order's order items.
+		_, err = OrderItemsCacheKeyspace.Delete(ctx, oi.OrderID)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting order items cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
@@ -122,12 +131,15 @@ func UpdateOrderItem(ctx context.Context, oi *models.OrderItem) (*models.OrderRe
 	if err != nil {
 		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
 	}
-	// Invalidate the cache for the order's order items.
-	_, err = OrderItemsCacheKeyspace.Delete(ctx, oi.OrderID)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting order items cache", err)
-	}
+	// Fire go routine to invalidate the cache for the order's order items.
+	go func() {
+		// Invalidate the cache for the order's order items.
+		_, err = OrderItemsCacheKeyspace.Delete(ctx, oi.OrderID)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting order items cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
@@ -143,12 +155,15 @@ func DeleteOrderItem(ctx context.Context, id int) (*models.OrderRequestStatus, e
 	if err != nil {
 		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
 	}
-	// Invalidate the cache for the order's order items.
-	_, err = OrderItemsCacheKeyspace.Delete(ctx, id)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting order items cache", err)
-	}
+	// Fire go routine to invalidate the cache for the order's order items.
+	go func() {
+		// Invalidate the cache for the order's order items.
+		_, err = OrderItemsCacheKeyspace.Delete(ctx, id)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting order items cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 	

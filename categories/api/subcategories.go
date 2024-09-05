@@ -13,7 +13,7 @@ import (
 // ------------------------------------------------------
 // Setup Database
 // SubCategoriesTable instance.
-var SubCategoriesTable = &db.SubCategoriesTable{DB: ProductsDB}
+var SubCategoriesTable = &db.SubCategoriesTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -54,11 +54,14 @@ func GetSubCategory(ctx context.Context, id int) (*models.SubCategory, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the sub-category.
-	if err := SubCategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching sub-category", err)
-	}
+	// Fire go routine to cache the sub-category.
+	go func() {
+		// Cache the sub-category.
+		if err := SubCategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching sub-category", err)
+		}
+	}()
 	// Return the sub-category.
 	return r, err
 }
@@ -78,11 +81,14 @@ func GetSubCategories(ctx context.Context) (*models.SubCategories, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the sub-categories.
-	if err := SubCategoriesCacheKeyspace.Set(ctx, "all", *r); err != nil {
-		// log error
-		rlog.Error("Error caching sub-categories", err)
-	}
+	// Fire go routine to cache the sub-categories.
+	go func() {
+		// Cache the sub-categories.
+		if err := SubCategoriesCacheKeyspace.Set(ctx, "all", *r); err != nil {
+			// log error
+			rlog.Error("Error caching sub-categories", err)
+		}
+	}()
 	// Return the sub-categories.
 	return r, err
 }
@@ -102,11 +108,14 @@ func GetSubCategoriesByCategory(ctx context.Context, category_id int) (*models.S
 	if err != nil {
 		return nil, err
 	}
-	// Cache the sub-categories.
-	if err := SubCategoriesByCategoryCacheKeyspace.Set(ctx, category_id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching sub-categories by category", err)
-	}
+	// Fire go routine to cache the sub-categories.
+	go func() {
+		// Cache the sub-categories.
+		if err := SubCategoriesByCategoryCacheKeyspace.Set(ctx, category_id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching sub-categories by category", err)
+		}
+	}()
 	// Return the sub-categories.
 	return r, err
 }

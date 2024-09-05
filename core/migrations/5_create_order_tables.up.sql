@@ -1,6 +1,6 @@
 CREATE TABLE orders (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    user_id BIGINT NOT NULL,
+    user_id TEXT NOT NULL,
     address_id BIGINT NOT NULL,
     total_price INT NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -17,3 +17,7 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+CREATE INDEX idx_user_id_orders ON orders (user_id);
+
+CREATE INDEX idx_order_id_order_items ON order_items (order_id);

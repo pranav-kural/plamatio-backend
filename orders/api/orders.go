@@ -14,11 +14,11 @@ import (
 // ------------------------------------------------------
 // Setup Database
 
-// ProductDB instance.
-var ProductsDB = sqldb.Named("products")
+// Database instance for Plamatio Backend.
+var PlamatioDB = sqldb.Named("plamatio_db")
 
 // OrdersTable instance.
-var OrdersTable = &db.OrdersTable{DB: ProductsDB}
+var OrdersTable = &db.OrdersTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -71,11 +71,14 @@ func GetOrder(ctx context.Context, id int) (*models.Order, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the order.
-	if err := OrderCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching order", err)
-	}
+	// Fire a go routine to cache the order.
+	go func() {
+		// Cache the order.
+		if err := OrderCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching order", err)
+		}
+	}()
 	// Return the order.
 	return r, err
 }
@@ -95,11 +98,14 @@ func GetOrders(ctx context.Context, user_id int) (*models.Orders, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the orders.
-	if err := UserOrdersCacheKeyspace.Set(ctx, user_id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching user orders", err)
-	}
+	// Fire a go routine to cache the orders.
+	go func() {
+		// Cache the orders.
+		if err := UserOrdersCacheKeyspace.Set(ctx, user_id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching user orders", err)
+		}
+	}()
 	// Return the orders.
 	return r, err
 }
@@ -113,12 +119,15 @@ func AddOrder(ctx context.Context, o *models.OrderRequestParams) (*models.Order,
 	if err != nil {
 		return nil, err
 	}
-	// Invalidate the cache for the user's orders.
-	_, err = UserOrdersCacheKeyspace.Delete(ctx, o.UserID)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting user orders cache", err)
-	}
+	// Fire a go routine to invalidate the cache for the user's orders.
+	go func() {
+		// Invalidate the cache for the user's orders.
+		_, err = UserOrdersCacheKeyspace.Delete(ctx, o.UserID)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting user orders cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
@@ -134,12 +143,15 @@ func UpdateOrder(ctx context.Context, o *models.Order) (*models.OrderRequestStat
 	if err != nil {
 		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
 	}
-	// Invalidate the cache for the user's orders.
-	_, err = UserOrdersCacheKeyspace.Delete(ctx, o.UserID)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting user orders cache", err)
-	}
+	// Fire a go routine to invalidate the cache for the user's orders.
+	go func() {
+		// Invalidate the cache for the user's orders.
+		_, err = UserOrdersCacheKeyspace.Delete(ctx, o.UserID)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting user orders cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
@@ -155,12 +167,16 @@ func DeleteOrder(ctx context.Context, id int) (*models.OrderRequestStatus, error
 	if err != nil {
 		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
 	}
-	// Invalidate the cache for the user's orders.
-	_, err = UserOrdersCacheKeyspace.Delete(ctx, id)
-	if err != nil {
-		// log error
-		rlog.Error("Error deleting user orders cache", err)
-	}
+	
+	// Fire a go routine to invalidate the cache for the user's orders.
+	go func() {
+		// Invalidate the cache for the user's orders.
+		_, err = UserOrdersCacheKeyspace.Delete(ctx, id)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting user orders cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 	

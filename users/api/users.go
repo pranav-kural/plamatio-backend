@@ -14,11 +14,11 @@ import (
 // ------------------------------------------------------
 // Setup Database
 
-// ProductDB instance.
-var ProductsDB = sqldb.Named("products")
+// Database instance for Plamatio Backend.
+var PlamatioDB = sqldb.Named("plamatio_db")
 
 // UsersTable instance.
-var UsersTable = &db.UsersTable{DB: ProductsDB}
+var UsersTable = &db.UsersTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -30,7 +30,7 @@ var UsersCluster = cache.NewCluster("users-cache-cluster", cache.ClusterConfig{
 })
 
 // User Cache Keyspace to store user data by ID.
-var UserCacheKeyspace = cache.NewStructKeyspace[int, models.User](UsersCluster, cache.KeyspaceConfig{
+var UserCacheKeyspace = cache.NewStructKeyspace[string, models.User](UsersCluster, cache.KeyspaceConfig{
 	KeyPattern:    "user-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
@@ -47,7 +47,7 @@ var RefUserCacheKeyspace = cache.NewStructKeyspace[string, models.User](UsersClu
 // GET: /users/get/:id
 // Retrieves the user from the database with the given ID.
 //encore:api auth method=GET path=/users/get/:id
-func GetUser(ctx context.Context, id int) (*models.User, error) {
+func GetUser(ctx context.Context, id string) (*models.User, error) {
 	// First, try retrieving the user from cache if it exists.
 	u, err := UserCacheKeyspace.Get(ctx, id)
 	// if user is found (i.e., no error), return it
@@ -59,35 +59,14 @@ func GetUser(ctx context.Context, id int) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the user.
-	if err := UserCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// Log the error
-		rlog.Error("error caching user data", err)
-	}
-	// Return the user.
-	return r, err
-}
-
-// GET: /users/ref/:id
-// Retrieves the user from the database with the given reference ID.
-//encore:api auth method=GET path=/users/ref/:id
-func GetUserByRefID(ctx context.Context, id string) (*models.User, error) {
-	// First, try retrieving the user from cache if it exists.
-	u, err := RefUserCacheKeyspace.Get(ctx, id)
-	// if user is found (i.e., no error), return it
-	if err == nil {
-		return &u, nil
-	}
-	// If the user is not found in cache, retrieve it from the database.
-	r, err := UsersTable.GetUserByRefID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	// Cache the user.
-	if err := RefUserCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// Log the error
-		rlog.Error("error caching user data", err)
-	}
+	// Fire a go routine to cache the user.
+	go func() {
+		// Cache the user.
+		if err := UserCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// Log the error
+			rlog.Error("error caching user data", err)
+		}
+	}()
 	// Return the user.
 	return r, err
 }
@@ -127,12 +106,16 @@ func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChan
 	if err != nil {
 		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
 	}
-	// Invalidate the cache for the user.
-	_, err = UserCacheKeyspace.Delete(ctx, updatedUser.ID)
-	if err != nil {
-		// Log the error
-		rlog.Error("error deleting user cache", err)
-	}
+	
+	// Fire a go routine to cache the user.
+	go func() {
+		// Invalidate the cache for the user.
+		_, err = UserCacheKeyspace.Delete(ctx, updatedUser.ID)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting user cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
@@ -143,18 +126,22 @@ func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChan
 // DELETE: /users/delete/:id
 // Deletes a user from the database.
 //encore:api auth method=DELETE path=/users/delete/:id
-func DeleteUser(ctx context.Context, id int) (*models.UserChangeRequestStatus, error) {
+func DeleteUser(ctx context.Context, id string) (*models.UserChangeRequestStatus, error) {
 	// Delete the user from the database.
 	err := UsersTable.DeleteUser(ctx, id)
 	if err != nil {
 		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
 	}
-	// Invalidate the cache for the user.
-	_, err = UserCacheKeyspace.Delete(ctx, id)
-	if err != nil {
-		// Log the error
-		rlog.Error("error deleting user cache", err)
-	}
+	
+	// Fire a go routine to invalidate the cache for the user.
+	go func() {
+		// Invalidate the cache for the user.
+		_, err = UserCacheKeyspace.Delete(ctx, id)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting user cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 

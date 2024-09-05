@@ -14,11 +14,11 @@ import (
 // ------------------------------------------------------
 // Setup Database
 
-// ProductDB instance.
-var ProductsDB = sqldb.Named("products")
+// Database instance for Plamatio Backend.
+var PlamatioDB = sqldb.Named("plamatio_db")
 
 // CategoriesTable instance.
-var CategoriesTable = &db.CategoriesTable{DB: ProductsDB}
+var CategoriesTable = &db.CategoriesTable{DB: PlamatioDB}
 
 // ------------------------------------------------------
 // Setup Caching
@@ -59,11 +59,14 @@ func GetCategory(ctx context.Context, id int) (*models.Category, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the category.
-	if err := CategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// log error
-		rlog.Error("Error caching category", err)
-	}
+	// Fire go routine to cache the category.
+	go func() {
+		// Cache the category.
+		if err := CategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// log error
+			rlog.Error("Error caching category", err)
+		}
+	}()
 	// Return the category.
 	return r, err
 }
@@ -83,11 +86,14 @@ func GetCategories(ctx context.Context) (*models.Categories, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the categories.
-	if err := CategoriesCacheKeyspace.Set(ctx, "all", *r); err != nil {
-		// log error
-		rlog.Error("Error caching categories", err)
-	}
+	// Fire go routine to cache the categories.
+	go func() {
+		// Cache the categories.
+		if err := CategoriesCacheKeyspace.Set(ctx, "all", *r); err != nil {
+			// log error
+			rlog.Error("Error caching categories", err)
+		}
+	}()
 	// Return the categories.
 	return r, err
 }
