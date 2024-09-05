@@ -87,23 +87,23 @@ func GetSubCategories(ctx context.Context) (*models.SubCategories, error) {
 	return r, err
 }
 
-// GET: /categories/subcategories/category/:id
+// GET: /categories/subcategories/category/:category_id
 // Retrieves all sub-categories from the database by category.
-//encore:api auth method=GET path=/categories/subcategories/category/:id
-func GetSubCategoriesByCategory(ctx context.Context, categoryId int) (*models.SubCategories, error) {
+//encore:api auth method=GET path=/categories/subcategories/category/:category_id
+func GetSubCategoriesByCategory(ctx context.Context, category_id int) (*models.SubCategories, error) {
 	// First, try retrieving all sub-categories from cache if they exist.
-	c, err := SubCategoriesByCategoryCacheKeyspace.Get(ctx, categoryId)
+	c, err := SubCategoriesByCategoryCacheKeyspace.Get(ctx, category_id)
 	// if sub-categories are found (i.e., no error), return them
 	if err == nil {
 		return &c, nil
 	}
 	// If the sub-categories are not found in cache, retrieve them from the database.
-	r, err := SubCategoriesTable.GetSubCategoriesByCategory(ctx, categoryId)
+	r, err := SubCategoriesTable.GetSubCategoriesByCategory(ctx, category_id)
 	if err != nil {
 		return nil, err
 	}
 	// Cache the sub-categories.
-	if err := SubCategoriesByCategoryCacheKeyspace.Set(ctx, categoryId, *r); err != nil {
+	if err := SubCategoriesByCategoryCacheKeyspace.Set(ctx, category_id, *r); err != nil {
 		// log error
 		rlog.Error("Error caching sub-categories by category", err)
 	}
