@@ -2,10 +2,10 @@ package users
 
 // User represents a user in the system.
 type User struct {
-	ID        int    `json:"id"`        // unique identifier
+	ID        string `json:"id"`        // unique identifier
 	FirstName string `json:"firstName"` // first name of the user
 	LastName  string `json:"lastName"`  // last name of the user
-	RefID     string `json:"refId"`     // reference ID
+	Email 	  string `json:"email"`     // email address of the user
 }
 
 // Address represents an address associated with a user.
@@ -16,7 +16,7 @@ type Address struct {
 	State    string `json:"state"`    // state
 	Country  string `json:"country"`  // country
 	ZipCode  string `json:"zipCode"`  // zip code
-	UserID   int    `json:"userId"`   // user ID
+	UserID   string    `json:"userId"`   // user ID
 }
 
 // Users represents a collection of user objects.
@@ -33,7 +33,7 @@ type Addresses struct {
 type UserRequestParams struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
-	RefID     string `json:"refId"`
+	Email     string `json:"email"`
 }
 
 // AddressRequestParams represents the request parameters for creating or updating a new address.
@@ -43,12 +43,18 @@ type AddressRequestParams struct {
 	State    string `json:"state"`
 	Country  string `json:"country"`
 	ZipCode  string `json:"zipCode"`
-	UserID   int    `json:"userId"`
+	UserID   string    `json:"userId"`
 }
 
 // UserChangeRequestStatus represents the status of a user change request.
 type UserChangeRequestStatus struct {
 	Status string `json:"status"`
+}
+
+// DeleteUserParams represents the parameters for deleting a user.
+type DeleteAddressParams struct {
+	AddressID	int `json:"addressId"`
+	UserID		string `json:"userId"`
 }
 
 // UserRequestSuccess represents a successful user request status.
