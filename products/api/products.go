@@ -9,6 +9,7 @@ import (
 	models "encore.app/products/models"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
+	rlog "encore.dev/rlog"
 	"encore.dev/storage/cache"
 	"encore.dev/storage/sqldb"
 )
@@ -190,10 +191,14 @@ func GetAll(ctx context.Context) (*models.Products, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the products.
-	if err := ProductsCacheKeyspace.Set(ctx, "all", *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the products.
+	go func() {
+		// Cache the products.
+		if err := ProductsCacheKeyspace.Set(ctx, "all", *r); err != nil {
+			// Log the error
+			rlog.Error("error caching products data", err)
+		}
+	}()
 	// Return the products.
 	return r, err
 }
@@ -213,10 +218,14 @@ func GetByCategory(ctx context.Context, id int) (*models.Products, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the products.
-	if err := ProductCategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the products.
+	go func() {
+		// Cache the products.
+		if err := ProductCategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// Log the error
+			rlog.Error("error caching product category data", err)
+		}
+	}()
 	// Return the products.
 	return r, err
 }
@@ -236,10 +245,14 @@ func GetBySubCategory(ctx context.Context, id int) (*models.Products, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the products.
-	if err := ProductSubCategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the products.
+	go func() {
+		// Cache the products.
+		if err := ProductSubCategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// Log the error
+			rlog.Error("error caching product sub-category data", err)
+		}
+	}()
 	// Return the products.
 	return r, err
 }
@@ -259,10 +272,14 @@ func GetHeroProducts(ctx context.Context) (*models.Products, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the hero products.
-	if err := HeroProductsCacheKeyspace.Set(ctx, "all", *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the hero products.
+	go func() {
+		// Cache the hero products.
+		if err := HeroProductsCacheKeyspace.Set(ctx, "all", *r); err != nil {
+			// Log the error
+			rlog.Error("error caching hero products data", err)
+		}
+	}()
 	// Return the products.
 	return r, err
 }
@@ -281,10 +298,14 @@ func GetHeroProductsByCategory(ctx context.Context, category int) (*models.Produ
 	if err != nil {
 		return nil, err
 	}
-	// Cache the hero products by category.
-	if err := HeroProductsCacheKeyspace.Set(ctx, strconv.Itoa(category), *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the hero products.
+	go func() {
+		// Cache the hero products by category.
+		if err := HeroProductsCacheKeyspace.Set(ctx, strconv.Itoa(category), *r); err != nil {
+			// Log the error
+			rlog.Error("error caching hero products data", err)
+		}
+	}()
 	// Return the products.
 	return r, err
 }
@@ -304,10 +325,14 @@ func Search(ctx context.Context, query string) (*models.Products, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the products.
-	if err := ProductSearchCacheKeyspace.Set(ctx, query, *r); err != nil {
-		return nil, err
-	}
+	// Fire a go routine to cache the products.
+	go func() {
+		// Cache the products.
+		if err := ProductSearchCacheKeyspace.Set(ctx, query, *r); err != nil {
+			// Log the error
+			rlog.Error("error caching product search data", err)
+		}
+	}()
 	// Return the products.
 	return r, err
 }
