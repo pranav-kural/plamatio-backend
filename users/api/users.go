@@ -59,11 +59,14 @@ func GetUser(ctx context.Context, id string) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Cache the user.
-	if err := UserCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// Log the error
-		rlog.Error("error caching user data", err)
-	}
+	// Fire a go routine to cache the user.
+	go func() {
+		// Cache the user.
+		if err := UserCacheKeyspace.Set(ctx, id, *r); err != nil {
+			// Log the error
+			rlog.Error("error caching user data", err)
+		}
+	}()
 	// Return the user.
 	return r, err
 }
@@ -103,12 +106,16 @@ func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChan
 	if err != nil {
 		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
 	}
-	// Invalidate the cache for the user.
-	_, err = UserCacheKeyspace.Delete(ctx, updatedUser.ID)
-	if err != nil {
-		// Log the error
-		rlog.Error("error deleting user cache", err)
-	}
+	
+	// Fire a go routine to cache the user.
+	go func() {
+		// Invalidate the cache for the user.
+		_, err = UserCacheKeyspace.Delete(ctx, updatedUser.ID)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting user cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
@@ -125,12 +132,16 @@ func DeleteUser(ctx context.Context, id string) (*models.UserChangeRequestStatus
 	if err != nil {
 		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
 	}
-	// Invalidate the cache for the user.
-	_, err = UserCacheKeyspace.Delete(ctx, id)
-	if err != nil {
-		// Log the error
-		rlog.Error("error deleting user cache", err)
-	}
+	
+	// Fire a go routine to invalidate the cache for the user.
+	go func() {
+		// Invalidate the cache for the user.
+		_, err = UserCacheKeyspace.Delete(ctx, id)
+		if err != nil {
+			// Log the error
+			rlog.Error("error deleting user cache", err)
+		}
+	}()
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
