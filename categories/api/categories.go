@@ -6,6 +6,7 @@ import (
 
 	db "encore.app/categories/db"
 	models "encore.app/categories/models"
+	rlog "encore.dev/rlog"
 	"encore.dev/storage/cache"
 	"encore.dev/storage/sqldb"
 )
@@ -60,7 +61,8 @@ func GetCategory(ctx context.Context, id int) (*models.Category, error) {
 	}
 	// Cache the category.
 	if err := CategoryCacheKeyspace.Set(ctx, id, *r); err != nil {
-		return nil, err
+		// log error
+		rlog.Error("Error caching category", err)
 	}
 	// Return the category.
 	return r, err
@@ -83,7 +85,8 @@ func GetCategories(ctx context.Context) (*models.Categories, error) {
 	}
 	// Cache the categories.
 	if err := CategoriesCacheKeyspace.Set(ctx, "all", *r); err != nil {
-		return nil, err
+		// log error
+		rlog.Error("Error caching categories", err)
 	}
 	// Return the categories.
 	return r, err

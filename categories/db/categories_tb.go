@@ -40,13 +40,6 @@ const (
     SQL_GET_ALL_CATEGORIES = `
         SELECT id, name, description, offered FROM categories
     `
-		SQL_GET_SUB_CATEGORY = `
-				SELECT name, description, category_id, offered FROM sub_categories
-				WHERE id = $1
-		`
-		SQL_GET_ALL_SUB_CATEGORIES = `
-				SELECT id, name, description, category_id, offered FROM sub_categories
-		`
 )
 
 // Retrieves a category from the database.
@@ -78,35 +71,4 @@ func (tb *CategoriesTable) GetAll(ctx context.Context) (*models.Categories, erro
 		categories = append(categories, c)
 	}
 	return &models.Categories{Data: categories}, nil
-}
-
-// Retrieves a sub-category from the database.
-func (tb *CategoriesTable) GetSubCategory(ctx context.Context, id int) (*models.SubCategory, error) {
-	// validate id
-	err := utils.ValidateProductSubCategory(id)
-	if err != nil {
-		return nil, err
-	}
-	sc := &models.SubCategory{ID: id}
-	err = tb.DB.QueryRow(ctx, SQL_GET_SUB_CATEGORY, id).Scan(&sc.Name, &sc.Description, &sc.CategoryId, &sc.Offered)
-	return sc, err
-}
-
-// Retrieves all sub-categories from the database.
-func (tb *CategoriesTable) GetAllSubCategories(ctx context.Context) (*models.SubCategories, error) {
-	rows, err := tb.DB.Query(ctx, SQL_GET_ALL_SUB_CATEGORIES)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var subCategories []*models.SubCategory
-	for rows.Next() {
-		sc := &models.SubCategory{}
-		if err := rows.Scan(&sc.ID, &sc.Name, &sc.Description, &sc.CategoryId, &sc.Offered); err != nil {
-			return nil, err
-		}
-		subCategories = append(subCategories, sc)
-	}
-	return &models.SubCategories{Data: subCategories}, nil
 }
