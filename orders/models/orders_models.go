@@ -49,6 +49,18 @@ type OrderRequestParams struct {
 	Status    string `json:"status"`       // Current status of the order.
 }
 
+// DetailedOrderItemRequestParams represents the parameters for creating or updating an order item with product details.
+type DetailedOrderItemRequestParams struct {
+	ProductID int `json:"product_id"`      // ID of the product associated with the item.
+	Quantity  int `json:"quantity"`        // Quantity of the item.
+}
+
+// DetailedOrderRequestParams represents the parameters for creating or updating an order with items.
+type DetailedOrderRequestParams struct {
+	Order *OrderRequestParams `json:"order"` // The order entity.
+	Items []*DetailedOrderItemRequestParams `json:"items"` // List of order item entities.
+}
+
 // OrderItemRequestParams represents the parameters for creating or updating an order item.
 type OrderItemRequestParams struct {
 	OrderID   int `json:"order_id"`        // ID of the order to which the item belongs.
