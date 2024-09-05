@@ -2,6 +2,8 @@
 
 Plamatio is a production-ready E-commerce store focused on Llama-inspired products. This e-commerce store was built as part of [my portfolio](https://www.pkural.ca/) projects for demonstration of some cutting-edge technologies in building a highly performant, scalable, and resilient backend that composes of a robust Go-lang written REST API with PostgreSQL databases, Kafka-based real-time data streaming, Redis cache system, backend system monitoring and observability through Grafana, and more.
 
+[Plamatio Backend Documentation](https://pkural.notion.site/Plamatio-Backend-Documentation-d8c426f7851546c19df095c7fbf72282)
+
 ## Primary Features
 
 - **Distributed REST API:** Plamatio backend consists of multiple distributed modularized REST API services, each with its Redis cache and PostgreSQL database. This distributed architecture allows for maximal scalability, reduced development and maintenance complexity, and increased productivity in fixing issues and releasing feature updates.
@@ -41,7 +43,7 @@ Basic workflow when adding a new API service would look like:
 
 ## API Specifications
 
-Please refer to [Plamatio Backend API Specifications]() for more information on the REST API endpoints and their specifications.
+Please refer to [Plamatio Backend REST API Specifications](https://pkural.notion.site/REST-API-Specifications-c3fe4301baec4f23a01a86373896ff6a) for more information on the REST API endpoints and their specifications.
 
 ## REST API Architecture
 
