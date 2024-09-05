@@ -30,7 +30,7 @@ var UsersCluster = cache.NewCluster("users-cache-cluster", cache.ClusterConfig{
 })
 
 // User Cache Keyspace to store user data by ID.
-var UserCacheKeyspace = cache.NewStructKeyspace[int, models.User](UsersCluster, cache.KeyspaceConfig{
+var UserCacheKeyspace = cache.NewStructKeyspace[string, models.User](UsersCluster, cache.KeyspaceConfig{
 	KeyPattern:    "user-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
@@ -47,7 +47,7 @@ var RefUserCacheKeyspace = cache.NewStructKeyspace[string, models.User](UsersClu
 // GET: /users/get/:id
 // Retrieves the user from the database with the given ID.
 //encore:api auth method=GET path=/users/get/:id
-func GetUser(ctx context.Context, id int) (*models.User, error) {
+func GetUser(ctx context.Context, id string) (*models.User, error) {
 	// First, try retrieving the user from cache if it exists.
 	u, err := UserCacheKeyspace.Get(ctx, id)
 	// if user is found (i.e., no error), return it
@@ -61,30 +61,6 @@ func GetUser(ctx context.Context, id int) (*models.User, error) {
 	}
 	// Cache the user.
 	if err := UserCacheKeyspace.Set(ctx, id, *r); err != nil {
-		// Log the error
-		rlog.Error("error caching user data", err)
-	}
-	// Return the user.
-	return r, err
-}
-
-// GET: /users/ref/:id
-// Retrieves the user from the database with the given reference ID.
-//encore:api auth method=GET path=/users/ref/:id
-func GetUserByRefID(ctx context.Context, id string) (*models.User, error) {
-	// First, try retrieving the user from cache if it exists.
-	u, err := RefUserCacheKeyspace.Get(ctx, id)
-	// if user is found (i.e., no error), return it
-	if err == nil {
-		return &u, nil
-	}
-	// If the user is not found in cache, retrieve it from the database.
-	r, err := UsersTable.GetUserByRefID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	// Cache the user.
-	if err := RefUserCacheKeyspace.Set(ctx, id, *r); err != nil {
 		// Log the error
 		rlog.Error("error caching user data", err)
 	}
@@ -143,7 +119,7 @@ func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChan
 // DELETE: /users/delete/:id
 // Deletes a user from the database.
 //encore:api auth method=DELETE path=/users/delete/:id
-func DeleteUser(ctx context.Context, id int) (*models.UserChangeRequestStatus, error) {
+func DeleteUser(ctx context.Context, id string) (*models.UserChangeRequestStatus, error) {
 	// Delete the user from the database.
 	err := UsersTable.DeleteUser(ctx, id)
 	if err != nil {

@@ -40,20 +40,20 @@ func ValidateNewUserData(user *models.UserRequestParams) error {
 	if user.LastName == "" {
 		return errors.New("missing last name")
 	}
-	if user.RefID == "" {
-		return errors.New("missing reference ID")
+	if user.Email == "" {
+		return errors.New("missing user email")
 	}
 	return nil
 }
 
 func ValidateUpdateUserData(user *models.User) error {
-	if user.ID <= 0 {
+	if user.ID == "" {
 		return errors.New("invalid user ID")
 	}
 	return ValidateNewUserData(&models.UserRequestParams{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
-		RefID:     user.RefID,
+		Email:     user.Email,
 	})
 }
 
@@ -88,7 +88,7 @@ func ValidateNewAddressData(address *models.AddressRequestParams) error {
 	if address.ZipCode == "" {
 		return errors.New("missing zip code")
 	}
-	if address.UserID <= 0 {
+	if address.UserID == "" {
 		return errors.New("invalid user ID")
 	}
 	return nil
