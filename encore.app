@@ -5,8 +5,7 @@
     // that don't include credentials. If nil it defaults to allowing all domains
     // (equivalent to ["*"]).
     "allow_origins_without_credentials": [
-      "http://localhost:*",
-      "https://plamatio-frontend.vercel.app"
+      "*"
     ],
 
     // allow_origins_with_credentials specifies the allowed origins for requests
@@ -16,8 +15,7 @@
     // The URLs in this list may include wildcards (e.g. "https://*.example.com"
     // or "https://*-myapp.example.com").
     "allow_origins_with_credentials": [
-      "http://localhost:*",
-      "https://plamatio-frontend.vercel.app"
+      "*"
     ]
   }
 }
