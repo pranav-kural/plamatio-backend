@@ -125,11 +125,11 @@ func AddOrderItem(ctx context.Context, oi *models.OrderItemRequestParams) (*mode
 // PUT: /orders/items/update
 // Updates an order item in the database.
 //encore:api auth method=PUT path=/orders/items/update
-func UpdateOrderItem(ctx context.Context, oi *models.OrderItem) (*models.OrderRequestStatus, error) {
+func UpdateOrderItem(ctx context.Context, oi *models.OrderItem) (*models.OrderItemChangeRequestReturn, error) {
 	// Update the order item in the database.
 	err := OrderItemsTable.UpdateOrderItem(ctx, oi)
 	if err != nil {
-		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
+		return nil, err
 	}
 	// Fire go routine to invalidate the cache for the order's order items.
 	go func() {
@@ -143,17 +143,17 @@ func UpdateOrderItem(ctx context.Context, oi *models.OrderItem) (*models.OrderRe
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
-	return &models.OrderRequestStatus{Status: models.OrderRequestSuccess}, err
+	return &models.OrderItemChangeRequestReturn{OrderItemID: oi.ID}, nil
 }
 
 // DELETE: /orders/items/delete/:id
 // Deletes an order item from the database.
 //encore:api auth method=DELETE path=/orders/items/delete/:id
-func DeleteOrderItem(ctx context.Context, id int) (*models.OrderRequestStatus, error) {
+func DeleteOrderItem(ctx context.Context, id int) (*models.OrderItemChangeRequestReturn, error) {
 	// Delete the order item from the database.
 	err := OrderItemsTable.DeleteOrderItem(ctx, id)
 	if err != nil {
-		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
+		return nil, err
 	}
 	// Fire go routine to invalidate the cache for the order's order items.
 	go func() {
@@ -167,5 +167,5 @@ func DeleteOrderItem(ctx context.Context, id int) (*models.OrderRequestStatus, e
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 	
-	return &models.OrderRequestStatus{Status: models.OrderRequestSuccess}, err
+	return &models.OrderItemChangeRequestReturn{OrderItemID: id}, nil
 }

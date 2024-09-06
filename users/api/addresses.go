@@ -110,11 +110,11 @@ func AddAddress(ctx context.Context, newAddress *models.AddressRequestParams) (*
 // PUT: /users/addresses/update
 // Updates an address in the database.
 //encore:api auth method=PUT path=/users/addresses/update
-func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models.UserChangeRequestStatus, error) {
+func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models.AddressChangeRequestReturn, error) {
 	// Update the address in the database.
 	err := AddressesTable.UpdateAddress(ctx, updatedAddress)
 	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
+		return nil, err
 	}
 	
 	// Fire a go routine to invalidate the cache for the address.
@@ -137,18 +137,18 @@ func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
 	// Return request status.
-	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, nil
+	return &models.AddressChangeRequestReturn{AddressId: updatedAddress.ID}, nil
 }
 
 // DELETE: /users/addresses/delete
 // Deletes an address from the database.
 //encore:api auth method=DELETE path=/users/addresses/delete
-func DeleteAddress(ctx context.Context, params *models.DeleteAddressParams) (*models.UserChangeRequestStatus, error) {
+func DeleteAddress(ctx context.Context, params *models.DeleteAddressParams) (*models.AddressChangeRequestReturn, error) {
 
 	// Delete the address from the database.
 	err := AddressesTable.DeleteAddress(ctx, params.AddressID)
 	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
+		return nil, err
 	}
 
 	// Fire a go routine to invalidate the cache for the address.
@@ -170,5 +170,5 @@ func DeleteAddress(ctx context.Context, params *models.DeleteAddressParams) (*mo
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
 	// Return request status.
-	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, nil
+	return &models.AddressChangeRequestReturn{AddressId: params.AddressID}, nil
 }

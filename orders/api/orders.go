@@ -137,11 +137,11 @@ func AddOrder(ctx context.Context, o *models.OrderRequestParams) (*models.Order,
 // PUT: /orders/update
 // Updates an order in the database.
 //encore:api auth method=PUT path=/orders/update
-func UpdateOrder(ctx context.Context, o *models.Order) (*models.OrderRequestStatus, error) {
+func UpdateOrder(ctx context.Context, o *models.Order) (*models.OrderChangeRequestReturn, error) {
 	// Update the order in the database.
 	err := OrdersTable.UpdateOrder(ctx, o)
 	if err != nil {
-		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
+		return nil, err
 	}
 	// Fire a go routine to invalidate the cache for the user's orders.
 	go func() {
@@ -155,17 +155,17 @@ func UpdateOrder(ctx context.Context, o *models.Order) (*models.OrderRequestStat
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
-	return &models.OrderRequestStatus{Status: models.OrderRequestSuccess}, err
+	return &models.OrderChangeRequestReturn{OrderID: o.ID}, nil
 }
 
 // DELETE: /orders/delete/:id
 // Deletes an order from the database.
 //encore:api auth method=DELETE path=/orders/delete/:id
-func DeleteOrder(ctx context.Context, id int) (*models.OrderRequestStatus, error) {
+func DeleteOrder(ctx context.Context, id int) (*models.OrderChangeRequestReturn, error) {
 	// Delete the order from the database.
 	err := OrdersTable.DeleteOrder(ctx, id)
 	if err != nil {
-		return &models.OrderRequestStatus{Status: models.OrderRequestFailed}, err
+		return nil, err
 	}
 	
 	// Fire a go routine to invalidate the cache for the user's orders.
@@ -180,5 +180,5 @@ func DeleteOrder(ctx context.Context, id int) (*models.OrderRequestStatus, error
 
 	// TODO: Publish a message to a message broker to notify other services of the change.
 	
-	return &models.OrderRequestStatus{Status: models.OrderRequestSuccess}, err
+	return &models.OrderChangeRequestReturn{OrderID: id}, nil
 }

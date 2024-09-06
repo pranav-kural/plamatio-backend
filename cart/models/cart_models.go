@@ -25,13 +25,7 @@ type NewCartItems struct {
 	Data []*NewCartItem `json:"data"`  // Data is the list of new cart items.
 }
 
-// CartChangeRequestStatus represents the status of a cart change request.
-type CartChangeRequestStatus struct {
-	Status string `json:"status"`  // Status is the status of the cart change request.
+// Return type for cart mutation requests.
+type CartChangeRequestReturn struct {
+	CartID int `json:"id"`  // CartID is the identifier of the cart.
 }
-
-// CartRequestSuccess is the status for a successful cart request.
-const CartRequestSuccess = "success"
-
-// CartRequestFailed is the status for a failed cart request.
-const CartRequestFailed = "failed"

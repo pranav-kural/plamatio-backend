@@ -46,19 +46,18 @@ type AddressRequestParams struct {
 	UserID   string    `json:"userId"`
 }
 
-// UserChangeRequestStatus represents the status of a user change request.
-type UserChangeRequestStatus struct {
-	Status string `json:"status"`
-}
-
 // DeleteUserParams represents the parameters for deleting a user.
 type DeleteAddressParams struct {
 	AddressID	int `json:"addressId"`
 	UserID		string `json:"userId"`
 }
 
-// UserRequestSuccess represents a successful user request status.
-const UserRequestSuccess = "success"
+// Return type for mutations to user data.
+type UserChangeRequestReturn struct {
+	UserId string `json:"id"`
+}
 
-// UserRequestFailed represents a failed user request status.
-const UserRequestFailed = "failed"
+// Return type for mutations to address data.
+type AddressChangeRequestReturn struct {
+	AddressId int `json:"id"`
+}

@@ -130,11 +130,11 @@ func AddCartItem(ctx context.Context, newCartItem *models.NewCartItem) (*models.
 // PUT: /cart/update
 // Updates a cart item in the database.
 //encore:api auth method=PUT path=/cart/update
-func UpdateCartItem(ctx context.Context, updatedCartItem *models.CartItem) (*models.CartChangeRequestStatus, error) {
+func UpdateCartItem(ctx context.Context, updatedCartItem *models.CartItem) (*models.CartChangeRequestReturn, error) {
 	// Update the cart item in the database.
 	err := CartItemsTable.UpdateCartItem(ctx, updatedCartItem.ProductID, updatedCartItem.Quantity, updatedCartItem.UserID, updatedCartItem.ID)
 	if err != nil {
-		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
+		return nil, err
 	}
 	// Fire go routine to invalidate the cache for the user's cart items.
 	go func() {
@@ -148,17 +148,17 @@ func UpdateCartItem(ctx context.Context, updatedCartItem *models.CartItem) (*mod
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
-	return &models.CartChangeRequestStatus{Status: models.CartRequestSuccess}, err
+	return &models.CartChangeRequestReturn{CartID: updatedCartItem.ID}, nil
 }
 
 // DELETE: /cart/delete/:id
 // Deletes a cart item from the database.
 //encore:api auth method=DELETE path=/cart/delete/:id
-func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestStatus, error) {
+func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestReturn, error) {
 	// Delete the cart item from the database.
 	err := CartItemsTable.DeleteCartItem(ctx, id)
 	if err != nil {
-		return &models.CartChangeRequestStatus{Status: models.CartRequestFailed}, err
+		return nil, err
 	}
 	// Fire go routine to invalidate the cache for the user's cart items.
 	go func() {
@@ -172,5 +172,5 @@ func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestStatu
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
-	return &models.CartChangeRequestStatus{Status: models.CartRequestSuccess}, err
+	return &models.CartChangeRequestReturn{CartID: id}, nil
 }

@@ -68,13 +68,12 @@ type OrderItemRequestParams struct {
 	Quantity  int `json:"quantity"`        // Quantity of the item.
 }
 
-// OrderRequestStatus represents the status of an order request.
-type OrderRequestStatus struct {
-	Status string `json:"status"`          // Status of the order request.
+// Order mutation request return type.
+type OrderChangeRequestReturn struct {
+	OrderID int `json:"id"`                // ID of the order.
 }
 
-// Constants for order request status.
-const (
-	OrderRequestSuccess = "success"         // Order request was successful.
-	OrderRequestFailed  = "failed"          // Order request failed.
-)
+// OrderItem mutation request return type.
+type OrderItemChangeRequestReturn struct {
+	OrderItemID int `json:"id"`            // ID of the order item.
+}

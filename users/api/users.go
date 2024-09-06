@@ -100,11 +100,11 @@ func AddUser(ctx context.Context, newUser *models.UserRequestParams) (*models.Us
 // PUT: /users/update
 // Updates a user in the database.
 //encore:api auth method=PUT path=/users/update
-func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChangeRequestStatus, error) {
+func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChangeRequestReturn, error) {
 	// Update the user in the database.
 	err := UsersTable.UpdateUser(ctx, updatedUser)
 	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
+		return nil, err
 	}
 	
 	// Fire a go routine to cache the user.
@@ -120,17 +120,17 @@ func UpdateUser(ctx context.Context, updatedUser *models.User) (*models.UserChan
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
 	// Return the user.
-	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, err
+	return &models.UserChangeRequestReturn{UserId: updatedUser.ID}, nil
 }
 
 // DELETE: /users/delete/:id
 // Deletes a user from the database.
 //encore:api auth method=DELETE path=/users/delete/:id
-func DeleteUser(ctx context.Context, id string) (*models.UserChangeRequestStatus, error) {
+func DeleteUser(ctx context.Context, id string) (*models.UserChangeRequestReturn, error) {
 	// Delete the user from the database.
 	err := UsersTable.DeleteUser(ctx, id)
 	if err != nil {
-		return &models.UserChangeRequestStatus{Status: models.UserRequestFailed}, err
+		return nil, err
 	}
 	
 	// Fire a go routine to invalidate the cache for the user.
@@ -146,5 +146,5 @@ func DeleteUser(ctx context.Context, id string) (*models.UserChangeRequestStatus
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
 	// Return the user.
-	return &models.UserChangeRequestStatus{Status: models.UserRequestSuccess}, err
+	return &models.UserChangeRequestReturn{UserId: id}, nil
 }
