@@ -87,7 +87,7 @@ func GetAllUsers(ctx context.Context) (*models.Users, error) {
 // POST: /users/add
 // Inserts a user into the database.
 //encore:api auth method=POST path=/users/add
-func AddUser(ctx context.Context, newUser *models.UserRequestParams) (*models.User, error) {
+func AddUser(ctx context.Context, newUser *models.User) (*models.User, error) {
 	// Insert the user into the database.
 	r, err := UsersTable.InsertUser(ctx, newUser)
 	if err != nil {

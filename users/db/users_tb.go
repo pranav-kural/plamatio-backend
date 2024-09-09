@@ -22,7 +22,7 @@ const (
 			SELECT id, first_name, last_name, email FROM users
 	`
 	SQL_INSERT_USER = `
-			INSERT INTO users (first_name, last_name, email) VALUES ($1, $2, $3) RETURNING id
+			INSERT INTO users (id, first_name, last_name, email) VALUES ($1, $2, $3, $4)
 	`
 	SQL_UPDATE_USER = `
 			UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4
@@ -60,22 +60,21 @@ func (tb *UsersTable) GetAllUsers(ctx context.Context) (*models.Users, error) {
 }
 
 // Inserts a user into the database.
-func (tb *UsersTable) InsertUser(ctx context.Context, newUser *models.UserRequestParams) (*models.User, error) {
+func (tb *UsersTable) InsertUser(ctx context.Context, newUser *models.User) (*models.User, error) {
 	// validate user data
-	err := utils.ValidateNewUserData(newUser)
+	err := utils.ValidateUserData(newUser)
 	if err != nil {
 		return nil, err
 	}
 
-	u := &models.User{FirstName: newUser.FirstName, LastName: newUser.LastName, Email: newUser.Email}
-	err = tb.DB.QueryRow(ctx, SQL_INSERT_USER, u.FirstName, u.LastName, u.Email).Scan(&u.ID)
-	return u, err
+	_, err = tb.DB.Exec(ctx, SQL_INSERT_USER, newUser.ID, newUser.FirstName, newUser.LastName, newUser.Email)
+	return newUser, err
 }
 
 // Updates a user in the database.
 func (tb *UsersTable) UpdateUser(ctx context.Context, updatedUser *models.User) error {
 	// validate user data
-	err := utils.ValidateUpdateUserData(updatedUser)
+	err := utils.ValidateUserData(updatedUser)
 	if err != nil {
 		return err
 	}
