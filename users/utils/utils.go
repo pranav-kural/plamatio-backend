@@ -34,7 +34,7 @@ CREATE INDEX idx_user_id_addresses ON addresses (user_id);
 */
 
 func ValidateUserData(user *models.User) error {
-	if user.ID != "" {
+	if user.ID == "" {
 		return errors.New("invalid user ID")
 	}
 	if user.FirstName == "" {
