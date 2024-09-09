@@ -140,13 +140,13 @@ func UpdateAddress(ctx context.Context, updatedAddress *models.Address) (*models
 	return &models.AddressChangeRequestReturn{AddressId: updatedAddress.ID}, nil
 }
 
-// DELETE: /users/addresses/delete
+// DELETE: /users/addresses/delete/:address_id/user/:user_id
 // Deletes an address from the database.
-//encore:api auth method=DELETE path=/users/addresses/delete
-func DeleteAddress(ctx context.Context, params *models.DeleteAddressParams) (*models.AddressChangeRequestReturn, error) {
+//encore:api auth method=DELETE path=/users/addresses/delete/:address_id/user/:user_id
+func DeleteAddress(ctx context.Context, address_id int, user_id string) (*models.AddressChangeRequestReturn, error) {
 
 	// Delete the address from the database.
-	err := AddressesTable.DeleteAddress(ctx, params.AddressID)
+	err := AddressesTable.DeleteAddress(ctx, address_id)
 	if err != nil {
 		return nil, err
 	}
@@ -154,13 +154,13 @@ func DeleteAddress(ctx context.Context, params *models.DeleteAddressParams) (*mo
 	// Fire a go routine to invalidate the cache for the address.
 	go func() {
 		// Invalidate the cache for the address.
-		_, err = AddressCacheKeyspace.Delete(ctx, params.AddressID)
+		_, err = AddressCacheKeyspace.Delete(ctx, address_id)
 		if err != nil {
 			// Log the error
 			rlog.Error("error deleting address cache", err)
 		}
 		// Invalidate the cache for the user addresses.
-		_, err = UserAddressesCacheKeyspace.Delete(ctx, params.UserID)
+		_, err = UserAddressesCacheKeyspace.Delete(ctx, user_id)
 		if err != nil {
 			// Log the error
 			rlog.Error("error deleting user addresses cache", err)
@@ -170,5 +170,5 @@ func DeleteAddress(ctx context.Context, params *models.DeleteAddressParams) (*mo
 	// TODO: Publish a message to a message broker to notify other services of the change.
 
 	// Return request status.
-	return &models.AddressChangeRequestReturn{AddressId: params.AddressID}, nil
+	return &models.AddressChangeRequestReturn{AddressId: address_id}, nil
 }
