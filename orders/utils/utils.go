@@ -22,7 +22,7 @@ func ValidateNewOrderData(data *models.OrderRequestParams) error {
 	}
 	// attempt to parse the created_at string
 	// should follow the RFC3339 format
-	_, err := time.Parse(time.RFC3339, data.CreatedAt)
+	_, err := time.Parse(time.RFC3339, data.CreatedAt.String())
 	if err != nil {
 		return errors.New("created_at is required and should follow the RFC3339 format")
 	}
