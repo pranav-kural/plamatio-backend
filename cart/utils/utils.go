@@ -19,7 +19,7 @@ func ValidateCartData(cartItem *models.CartItem, idRequired bool, allowEmpty boo
 	if cartItem.Quantity <= 0 {
 		return errors.New("invalid quantity, cannot be less than 1")
 	}
-	if cartItem.UserID <= 0 {
+	if cartItem.UserID == "" {
 		return errors.New("invalid user ID")
 	}
 	return nil
