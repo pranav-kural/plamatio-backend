@@ -8,7 +8,7 @@ import (
 )
 
 func ValidateNewOrderData(data *models.OrderRequestParams) error {
-	if data.UserID <= 0 {
+	if data.UserID == "" {
 		return errors.New("user_id is required")
 	}
 	if data.AddressID <= 0 {

@@ -4,7 +4,7 @@ package orders
 // Order represents an order entity.
 type Order struct {
 	ID        int    `json:"id"`          // Unique identifier for the order.
-	UserID    int    `json:"user_id"`     // ID of the user who placed the order.
+	UserID    string    `json:"user_id"`     // ID of the user who placed the order.
 	AddressID int    `json:"address_id"`  // ID of the address associated with the order.
 	TotalPrice int  `json:"total_price"`  // Total price of the order.
 	CreatedAt string `json:"created_at"`  // Timestamp indicating when the order was created.
@@ -42,7 +42,7 @@ type DetailedOrders struct {
 
 // OrderRequestParams represents the parameters for creating or updating an order.
 type OrderRequestParams struct {
-	UserID    int    `json:"user_id"`      // ID of the user placing the order.
+	UserID    string    `json:"user_id"`      // ID of the user placing the order.
 	AddressID int    `json:"address_id"`   // ID of the address associated with the order.
 	TotalPrice int  `json:"total_price"`   // Total price of the order.
 	CreatedAt string `json:"created_at"`   // Timestamp indicating when the order was created.

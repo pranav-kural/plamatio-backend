@@ -46,7 +46,7 @@ func GetDetailedOrder(ctx context.Context, order_id int) (*models.DetailedOrder,
 // GET: /orders/detailed/all/:user_id
 // Retrieves all orders with order items for a user from the database.
 //encore:api auth method=GET path=/orders/detailed/all/:user_id
-func GetDetailedOrders(ctx context.Context, user_id int) (*models.DetailedOrders, error) {
+func GetDetailedOrders(ctx context.Context, user_id string) (*models.DetailedOrders, error) {
 	// Retrieve all orders for a user from the database.
 	orders, err := GetOrders(ctx, user_id)
 	if orders == nil && err != nil {

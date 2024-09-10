@@ -62,7 +62,7 @@ func (tb *OrdersTable) GetAllOrders(ctx context.Context) (*models.Orders, error)
 }
 
 // Retrieves all orders for a user from the database.
-func (tb *OrdersTable) GetOrdersByUser(ctx context.Context, userId int) (*models.Orders, error) {
+func (tb *OrdersTable) GetOrdersByUser(ctx context.Context, userId string) (*models.Orders, error) {
 	rows, err := tb.DB.Query(ctx, SQL_GET_ORDERS_BY_USER, userId)
 	if err != nil {
 		return nil, err
