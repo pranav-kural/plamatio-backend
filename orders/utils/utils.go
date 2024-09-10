@@ -2,7 +2,6 @@ package orders
 
 import (
 	"errors"
-	"time"
 
 	models "encore.app/orders/models"
 )
@@ -20,12 +19,6 @@ func ValidateNewOrderData(data *models.OrderRequestParams) error {
 	if data.Status == "" {
 		return errors.New("status is required")
 	}
-	// attempt to parse the created_at string
-	// should follow the RFC3339 format
-	_, err := time.Parse(time.RFC3339, data.CreatedAt.String())
-	if err != nil {
-		return errors.New("created_at is required and should follow the RFC3339 format")
-	}
 	return nil
 }
 
@@ -37,7 +30,6 @@ func ValidateUpdateOrderData(data *models.Order) error {
 		UserID: data.UserID,
 		AddressID: data.AddressID,
 		TotalPrice: data.TotalPrice,
-		CreatedAt: data.CreatedAt,
 		Status: data.Status,
 	})
 }

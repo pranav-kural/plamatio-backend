@@ -47,7 +47,6 @@ type OrderRequestParams struct {
 	UserID    string    `json:"user_id"`      // ID of the user placing the order.
 	AddressID int    `json:"address_id"`   // ID of the address associated with the order.
 	TotalPrice int  `json:"total_price"`   // Total price of the order.
-	CreatedAt time.Time `json:"created_at"`   // Timestamp indicating when the order was created.
 	Status    string `json:"status"`       // Current status of the order.
 }
 
