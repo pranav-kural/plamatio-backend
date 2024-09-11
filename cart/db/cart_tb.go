@@ -113,6 +113,26 @@ func (tb *CartItemsTable) InsertCartItem(ctx context.Context, productID int, qua
 	return ci, nil
 }
 
+// Insert cart items into the database.
+func (tb *CartItemsTable) InsertCartItems(ctx context.Context, newCartItems *models.NewCartItems) (*models.CartItems, error) {
+	// store the cart items to be returned
+	var cartItems []*models.CartItem
+	for _, newCartItem := range newCartItems.Data {
+		// validate cart item data
+		err := utils.ValidateNewCartItems(newCartItems)
+		if err != nil {
+			return nil, err
+		}
+		// store the cart item
+		ci, err := tb.InsertCartItem(ctx, newCartItem.ProductID, newCartItem.Quantity, newCartItem.UserID)
+		if err != nil {
+			return nil, err
+		}
+		cartItems = append(cartItems, ci)
+	}
+	return &models.CartItems{Data: cartItems}, nil
+}
+
 // Updates a cart item in the database.
 func (tb *CartItemsTable) UpdateCartItem(ctx context.Context, productID int, quantity int, userID string, id int) error {
 	// validate cart item data
