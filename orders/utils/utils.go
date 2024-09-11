@@ -13,7 +13,7 @@ func ValidateNewOrderData(data *models.OrderRequestParams) error {
 	if data.AddressID <= 0 {
 		return errors.New("address_id is required")
 	}
-	if data.TotalPrice <= 0 {
+	if data.TotalPrice <= 0.0 {
 		return errors.New("total_price is required")
 	}
 	if data.Status == "" {
