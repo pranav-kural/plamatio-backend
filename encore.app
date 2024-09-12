@@ -8,7 +8,8 @@
       "*",
       "http://localhost:3000",
       "https://plamatio-frontend.vercel.app",
-      "https://plamatio-frontend-*.vercel.app"
+      "https://plamatio-frontend-*.vercel.app",
+      "https://plamatio.pkural.ca"
     ],
 
     // allow_origins_with_credentials specifies the allowed origins for requests
@@ -21,7 +22,8 @@
       "*",
       "http://localhost:3000",
       "https://plamatio-frontend.vercel.app",
-      "https://plamatio-frontend-*.vercel.app"
+      "https://plamatio-frontend-*.vercel.app",
+      "https://plamatio.pkural.ca"
     ]
   }
 }
