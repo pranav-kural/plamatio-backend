@@ -2,6 +2,7 @@ package orders
 
 import (
 	"context"
+	"time"
 
 	models "encore.app/orders/models"
 	utils "encore.app/orders/utils"
@@ -62,7 +63,7 @@ func (tb *OrdersTable) GetAllOrders(ctx context.Context) (*models.Orders, error)
 }
 
 // Retrieves all orders for a user from the database.
-func (tb *OrdersTable) GetOrdersByUser(ctx context.Context, userId int) (*models.Orders, error) {
+func (tb *OrdersTable) GetOrdersByUser(ctx context.Context, userId string) (*models.Orders, error) {
 	rows, err := tb.DB.Query(ctx, SQL_GET_ORDERS_BY_USER, userId)
 	if err != nil {
 		return nil, err
@@ -86,13 +87,16 @@ func (tb *OrdersTable) InsertOrder(ctx context.Context, o *models.OrderRequestPa
 	if err := utils.ValidateNewOrderData(o); err != nil {
 		return nil, err
 	}
+	// get current time in RFC3339 format
+	createdAt := time.Now()
+	createdAtRFC3339 := createdAt.Format(time.RFC3339)
 	// insert order
 	var id int
-	err := tb.DB.QueryRow(ctx, SQL_INSERT_ORDER, o.UserID, o.AddressID, o.TotalPrice, o.CreatedAt, o.Status).Scan(&id)
+	err := tb.DB.QueryRow(ctx, SQL_INSERT_ORDER, o.UserID, o.AddressID, o.TotalPrice, createdAtRFC3339, o.Status).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
-	return &models.Order{ID: id, UserID: o.UserID, AddressID: o.AddressID, TotalPrice: o.TotalPrice, CreatedAt: o.CreatedAt, Status: o.Status}, nil
+	return &models.Order{ID: id, UserID: o.UserID, AddressID: o.AddressID, TotalPrice: o.TotalPrice, CreatedAt: createdAt, Status: o.Status}, nil
 }
 
 // Updates an order in the database.

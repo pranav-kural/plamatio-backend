@@ -36,7 +36,7 @@ var OrderCacheKeyspace = cache.NewStructKeyspace[int, models.Order](OrdersCluste
 })
 
 // Orders Cache Keyspace to store all orders for a user.
-var UserOrdersCacheKeyspace = cache.NewStructKeyspace[int, models.Orders](OrdersCluster, cache.KeyspaceConfig{
+var UserOrdersCacheKeyspace = cache.NewStructKeyspace[string, models.Orders](OrdersCluster, cache.KeyspaceConfig{
 	KeyPattern:    "user-orders-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
@@ -86,7 +86,7 @@ func GetOrder(ctx context.Context, id int) (*models.Order, error) {
 // GET: /orders/all/:user_id
 // Retrieves all orders for a user from the database.
 //encore:api auth method=GET path=/orders/all/:user_id
-func GetOrders(ctx context.Context, user_id int) (*models.Orders, error) {
+func GetOrders(ctx context.Context, user_id string) (*models.Orders, error) {
 	// First, try retrieving all orders for a user from cache if they exist.
 	c, err := UserOrdersCacheKeyspace.Get(ctx, user_id)
 	// if orders are found (i.e., no error), return them
@@ -158,10 +158,10 @@ func UpdateOrder(ctx context.Context, o *models.Order) (*models.OrderChangeReque
 	return &models.OrderChangeRequestReturn{OrderID: o.ID}, nil
 }
 
-// DELETE: /orders/delete/:id
+// DELETE: /orders/delete/:id/user/:user_id
 // Deletes an order from the database.
-//encore:api auth method=DELETE path=/orders/delete/:id
-func DeleteOrder(ctx context.Context, id int) (*models.OrderChangeRequestReturn, error) {
+//encore:api auth method=DELETE path=/orders/delete/:id/user/:user_id
+func DeleteOrder(ctx context.Context, id int, user_id string) (*models.OrderChangeRequestReturn, error) {
 	// Delete the order from the database.
 	err := OrdersTable.DeleteOrder(ctx, id)
 	if err != nil {
@@ -171,7 +171,7 @@ func DeleteOrder(ctx context.Context, id int) (*models.OrderChangeRequestReturn,
 	// Fire a go routine to invalidate the cache for the user's orders.
 	go func() {
 		// Invalidate the cache for the user's orders.
-		_, err = UserOrdersCacheKeyspace.Delete(ctx, id)
+		_, err = UserOrdersCacheKeyspace.Delete(ctx, user_id)
 		if err != nil {
 			// log error
 			rlog.Error("Error deleting user orders cache", err)

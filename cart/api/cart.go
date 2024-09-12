@@ -37,7 +37,7 @@ var CartItemCacheKeyspace = cache.NewStructKeyspace[int, models.CartItem](CartCl
 })
 
 // Cart Items Cache Keyspace to store all cart items for a user.
-var CartItemsCacheKeyspace = cache.NewStructKeyspace[int, models.CartItems](CartCluster, cache.KeyspaceConfig{
+var CartItemsCacheKeyspace = cache.NewStructKeyspace[string, models.CartItems](CartCluster, cache.KeyspaceConfig{
 	KeyPattern:    "user-cart-items-cache/:key",
 	DefaultExpiry: cache.ExpireIn(2 * time.Hour),
 })
@@ -69,15 +69,15 @@ func GetCartItem(ctx context.Context, id int) (*models.CartItem, error) {
 		}
 	}()
 	// Return the cart item.
-	return r, err
+	return r, nil
 }
 
 // GET: /cart/all/:user_id
 // Retrieves all cart items for a user from the database.
 //encore:api auth method=GET path=/cart/all/:user_id
-func GetCartItems(ctx context.Context, user_id int) (*models.CartItems, error) {
-	// confirm user_id is valid - less than 1
-	if user_id < 1 {
+func GetCartItems(ctx context.Context, user_id string) (*models.CartItems, error) {
+	// confirm user_id is valid - not empty
+	if user_id == "" {
 		return nil, errors.New("invalid user_id")
 	}
 	// First, try retrieving all cart items for a user from cache if they exist.
@@ -100,7 +100,7 @@ func GetCartItems(ctx context.Context, user_id int) (*models.CartItems, error) {
 		}
 	}()
 	// Return the cart items.
-	return r, err
+	return r, nil
 }
 
 // POST: /cart/add
@@ -124,7 +124,31 @@ func AddCartItem(ctx context.Context, newCartItem *models.NewCartItem) (*models.
 
 	// TODO: Send event on Kafka topic for cart items update for the user.
 
-	return r, err
+	return r, nil
+}
+
+// POST: /cart/add/all
+// Inserts multiple cart items into the database.
+//encore:api auth method=POST path=/cart/add/all
+func AddCartItems(ctx context.Context, newCartItems *models.NewCartItems) (*models.CartItems, error) {
+	// Insert the cart items into the database.
+	r, err := CartItemsTable.InsertCartItems(ctx, newCartItems)
+	if err != nil {
+		return nil, err
+	}
+	// Fire go routine to invalidate the cache for the user's cart items.
+	go func() {
+		// Invalidate the cache for the user's cart items.
+		_, err = CartItemsCacheKeyspace.Delete(ctx, newCartItems.Data[0].UserID)
+		if err != nil {
+			// log error
+			rlog.Error("Error deleting user cart items cache", err)
+		}
+	}()
+
+	// TODO: Send event on Kafka topic for cart items update for the user.
+
+	return r, nil
 }
 
 // PUT: /cart/update
@@ -153,8 +177,8 @@ func UpdateCartItem(ctx context.Context, updatedCartItem *models.CartItem) (*mod
 
 // DELETE: /cart/delete/:id
 // Deletes a cart item from the database.
-//encore:api auth method=DELETE path=/cart/delete/:id
-func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestReturn, error) {
+//encore:api auth method=DELETE path=/cart/delete/:id/user/:user_id
+func DeleteCartItem(ctx context.Context, id int, user_id string) (*models.CartChangeRequestReturn, error) {
 	// Delete the cart item from the database.
 	err := CartItemsTable.DeleteCartItem(ctx, id)
 	if err != nil {
@@ -163,7 +187,7 @@ func DeleteCartItem(ctx context.Context, id int) (*models.CartChangeRequestRetur
 	// Fire go routine to invalidate the cache for the user's cart items.
 	go func() {
 		// Invalidate the cache for the user's cart items.
-		_, err = CartItemsCacheKeyspace.Delete(ctx, id)
+		_, err = CartItemsCacheKeyspace.Delete(ctx, user_id)
 		if err != nil {
 			// log error
 			rlog.Error("Error deleting user cart items cache", err)

@@ -33,7 +33,10 @@ CREATE INDEX idx_user_id_addresses ON addresses (user_id);
 
 */
 
-func ValidateNewUserData(user *models.UserRequestParams) error {
+func ValidateUserData(user *models.User) error {
+	if user.ID == "" {
+		return errors.New("invalid user ID")
+	}
 	if user.FirstName == "" {
 		return errors.New("missing first name")
 	}
@@ -44,17 +47,6 @@ func ValidateNewUserData(user *models.UserRequestParams) error {
 		return errors.New("missing user email")
 	}
 	return nil
-}
-
-func ValidateUpdateUserData(user *models.User) error {
-	if user.ID == "" {
-		return errors.New("invalid user ID")
-	}
-	return ValidateNewUserData(&models.UserRequestParams{
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Email:     user.Email,
-	})
 }
 
 func ValidateUpdateAddressData(address *models.Address) error {

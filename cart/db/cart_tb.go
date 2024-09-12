@@ -80,7 +80,7 @@ func (tb *CartItemsTable) GetAllCartItems(ctx context.Context) (*models.CartItem
 }
 
 // Retrieves all cart items for a user from the database.
-func (tb *CartItemsTable) GetCartItemsByUser(ctx context.Context, userId int) (*models.CartItems, error) {
+func (tb *CartItemsTable) GetCartItemsByUser(ctx context.Context, userId string) (*models.CartItems, error) {
 	rows, err := tb.DB.Query(ctx, SQL_GET_CART_ITEMS_BY_USER, userId)
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (tb *CartItemsTable) GetCartItemsByUser(ctx context.Context, userId int) (*
 }
 
 // Inserts a cart item into the database.
-func (tb *CartItemsTable) InsertCartItem(ctx context.Context, productID int, quantity int, userID int) (*models.CartItem, error) {
+func (tb *CartItemsTable) InsertCartItem(ctx context.Context, productID int, quantity int, userID string) (*models.CartItem, error) {
 	// validate cart item data
 	err := utils.ValidateCartData(&models.CartItem{ProductID: productID, Quantity: quantity, UserID: userID}, false, false)
 	if err != nil {
@@ -113,8 +113,28 @@ func (tb *CartItemsTable) InsertCartItem(ctx context.Context, productID int, qua
 	return ci, nil
 }
 
+// Insert cart items into the database.
+func (tb *CartItemsTable) InsertCartItems(ctx context.Context, newCartItems *models.NewCartItems) (*models.CartItems, error) {
+	// store the cart items to be returned
+	var cartItems []*models.CartItem
+	for _, newCartItem := range newCartItems.Data {
+		// validate cart item data
+		err := utils.ValidateNewCartItems(newCartItems)
+		if err != nil {
+			return nil, err
+		}
+		// store the cart item
+		ci, err := tb.InsertCartItem(ctx, newCartItem.ProductID, newCartItem.Quantity, newCartItem.UserID)
+		if err != nil {
+			return nil, err
+		}
+		cartItems = append(cartItems, ci)
+	}
+	return &models.CartItems{Data: cartItems}, nil
+}
+
 // Updates a cart item in the database.
-func (tb *CartItemsTable) UpdateCartItem(ctx context.Context, productID int, quantity int, userID int, id int) error {
+func (tb *CartItemsTable) UpdateCartItem(ctx context.Context, productID int, quantity int, userID string, id int) error {
 	// validate cart item data
 	err := utils.ValidateCartData(&models.CartItem{ID: id, ProductID: productID, Quantity: quantity, UserID: userID}, true, false)
 	if err != nil {
