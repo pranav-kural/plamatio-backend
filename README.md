@@ -7,8 +7,6 @@ Plamatio is a production-ready E-commerce store focused on Llama-inspired produc
 ![Plamatio Backend Deployment - Staging](https://img.shields.io/github/deployments/pranav-kural/plamatio-backend/staging?label=staging)
 ![Plamatio Backend Deployment - Production](https://img.shields.io/github/deployments/pranav-kural/plamatio-backend/prod?label=production)
 
-
-
 ## Primary Features
 
 - **Distributed REST API:** Plamatio backend consists of multiple distributed modularized REST API services, each with its Redis cache and PostgreSQL database. This distributed architecture allows for maximal scalability, reduced development and maintenance complexity, and increased productivity in fixing issues and releasing feature updates.
@@ -18,9 +16,10 @@ Plamatio is a production-ready E-commerce store focused on Llama-inspired produc
 - **Grafana:** Using Grafana Cloud for enchanced monitoring and observability going beyond basic logging, metrics collection and analysis, and API request tracing.
 - **Encore Cloud:** Using Encore Cloud for hosting backend application, secrets management, PostgreSQL database hosting, Redis hosting, and resource provisioning.
 
-Below image provides a high level overview of the primary components of the Plamatio Backend Infrastructure.
+Below image provides a high-level overview of the overall architecture of the Plamatio project.
+
 <p align="center">
-<img alt="Plamatio Backend Core Components" src="https://github.com/user-attachments/assets/6f60a6ca-2d79-49c7-89a0-f23cead66ab3" width="500px" />
+<img alt="Plamatio Overall Architecture" src="https://github.com/user-attachments/assets/98838e40-2331-41e0-8555-185e8196d0ca" width="600px" />
 </p>
 
 ## Project Structure
@@ -63,7 +62,7 @@ Below image presents a high-level overview of the distributed and scalable REST 
 To keep a scalable amounts of frontend interfaces in sync with data mutations, Plamatio uses a Confluent-based Kafka Service architecture to listen to and stream real-time data updates.
 
 <p align="center">
-<img alt="Plamatio Backend Real-time Data Streaming" src="https://github.com/user-attachments/assets/661c10a3-1cca-4c8d-aadb-cc88429d3f18" width="700px" />
+<img alt="Plamatio Backend Real-time Data Streaming" src="https://github.com/user-attachments/assets/bb29a411-b1da-4a62-8b99-55c2b8b482be" width="700px" />
 </p>
 
 ## Local Development
